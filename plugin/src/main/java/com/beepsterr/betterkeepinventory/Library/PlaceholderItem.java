@@ -29,6 +29,7 @@ public class PlaceholderItem {
 
             String value = Objects.requireNonNull(config.getString("operator")).toUpperCase();
             switch(value){
+                case "EQUALS":
                 case "==":
                 case "=":
                     operator = PlaceholderConditionType.EQUALS;
@@ -85,6 +86,8 @@ public class PlaceholderItem {
 
     public boolean test(Player player) {
 
+        BetterKeepInventory.instance.debug(player, "Testing Placeholder Condition: " + this.placeholder + " " + this.operator + " " + this.value);
+
         // Double check that PlaceholderAPI is still loaded (it could have been unloaded)
         if(!BetterKeepInventory.getInstance().checkDependency("PlaceholderAPI")) return false;
 
@@ -115,7 +118,14 @@ public class PlaceholderItem {
             default:
                 return false;
         }
+    }
 
-
+    @Override
+    public String toString() {
+        return "PlaceholderItem{" +
+                "placeholder='" + placeholder + '\'' +
+                ", operator=" + operator +
+                ", value='" + value + '\'' +
+                '}';
     }
 }

@@ -1,5 +1,6 @@
 package com.beepsterr.betterkeepinventory.Content.Conditions.PlaceholderAPI;
 
+import com.beepsterr.betterkeepinventory.BetterKeepInventory;
 import com.beepsterr.betterkeepinventory.Library.PlaceholderItem;
 import com.beepsterr.betterkeepinventory.api.Condition;
 import com.beepsterr.betterkeepinventory.api.Exceptions.ConditionParseError;
@@ -17,11 +18,9 @@ public class PlaceholderCondition implements Condition {
 
     public PlaceholderCondition(ConfigurationSection config) throws ConditionParseError {
         this.placeholderConditions = new ArrayList<>();
-
-        ConfigurationSection section = config.getConfigurationSection("placeholders");
-        if (section != null) {
-            for (String key : section.getKeys(false)) {
-                ConfigurationSection inner = section.getConfigurationSection(key);
+        if (config != null) {
+            for (String key : config.getKeys(false)) {
+                ConfigurationSection inner = config.getConfigurationSection(key);
                 if (inner != null) {
                     this.placeholderConditions.add(new PlaceholderItem(inner));
                 }
@@ -31,7 +30,10 @@ public class PlaceholderCondition implements Condition {
 
     @Override
     public boolean check(Player ply, PlayerDeathEvent deathEvent, PlayerRespawnEvent respawnEvent) {
+        BetterKeepInventory.instance.debug(ply, "Going to test " + this.placeholderConditions.size() + " placeholder conditions");
+
         for (PlaceholderItem item : this.placeholderConditions) {
+            BetterKeepInventory.instance.debug(ply, item.toString() + " Result: " + item.test(ply));
             if (item.test(ply)) {
                 return true;
             }

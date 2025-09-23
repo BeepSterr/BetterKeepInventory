@@ -42,7 +42,7 @@ public class ConfigRule {
             assert condSection != null;
             for (String key : condSection.getKeys(false))
             {
-                BetterKeepInventory.getInstance().debug("Trying Condition '" + key + '"');
+                BetterKeepInventory.getInstance().debug("Trying Condition '" + key + "'");
 
                 if (!api.conditionRegistry().has(key)) {
                     BetterKeepInventory.getInstance().debug("Condition '" + key + "' is not registered. Triggered in rule '" + name + ". Skipping.'");
@@ -112,7 +112,7 @@ public class ConfigRule {
         }
 
         // log all conditions that are to be checked
-        plugin.debug(ply, "Rule " + this + " checking conditions: " + conditions.stream().map(Condition::toString).reduce((a, b) -> a + ", " + b).orElse("None"));
+        plugin.debug(ply, "Rule " + this + " checking conditions: " + conditions.stream().map(Condition::getClass));
 
         if (conditions.isEmpty() || conditions.stream().allMatch(c -> c.check(ply, deathEvent, respawnEvent))) {
             plugin.debug(ply, "Rule " + this + " met conditions, running effects!");
