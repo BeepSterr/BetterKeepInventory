@@ -22,6 +22,7 @@ import com.beepsterr.betterkeepinventory.Registries.PluginConditionRegistry;
 import com.beepsterr.betterkeepinventory.Registries.PluginEffectRegistry;
 import com.beepsterr.betterkeepinventory.api.BetterKeepInventoryAPI;
 import com.beepsterr.betterkeepinventory.api.BetterKeepInventoryAPIImpl;
+import com.tcoded.folialib.FoliaLib;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -38,6 +39,7 @@ public final class BetterKeepInventory extends JavaPlugin implements Listener {
 
     public Config config;
     static public BetterKeepInventory instance;
+    private FoliaLib foliaLib;
 
     public Version version = new Version(getDescription().getVersion());
     public VersionChecker versionChecker;
@@ -54,6 +56,7 @@ public final class BetterKeepInventory extends JavaPlugin implements Listener {
     public void onEnable() {
 
         instance = this;
+        foliaLib = new FoliaLib(BetterKeepInventory.getInstance());
 
         // Initialize API
         BetterKeepInventoryAPI api = new BetterKeepInventoryAPIImpl(conditionRegistry, effectRegistry);
@@ -67,10 +70,6 @@ public final class BetterKeepInventory extends JavaPlugin implements Listener {
         }catch (UnloadableConfiguration e){
             CrashAndDisable("Configuration failed to load!\n" + e.getMessage());
             return;
-        }
-
-        if(config.getNotifyChannel() != VersionChannel.NONE){
-            versionChecker = new VersionChecker(config.getNotifyChannel());
         }
 
         // event handlers
@@ -88,6 +87,10 @@ public final class BetterKeepInventory extends JavaPlugin implements Listener {
         if(checkDependency("PlaceholderAPI")){
             log("Hello PlaceholderAPI!");
             new BetterKeepInventoryPlaceholderExpansion().register();
+        }
+
+        if(config.getNotifyChannel() != VersionChannel.NONE){
+            versionChecker = new VersionChecker(config.getNotifyChannel());
         }
 
     }
@@ -182,6 +185,10 @@ public final class BetterKeepInventory extends JavaPlugin implements Listener {
 
     public void log(String message){
         getLogger().log(Level.INFO, message);
+    }
+
+    public static FoliaLib getScheduler(){
+        return instance.foliaLib;
     }
 
 }

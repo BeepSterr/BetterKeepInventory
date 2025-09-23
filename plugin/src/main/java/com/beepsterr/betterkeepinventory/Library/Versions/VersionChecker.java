@@ -4,8 +4,8 @@ import com.beepsterr.betterkeepinventory.BetterKeepInventory;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.tcoded.folialib.FoliaLib;
 import org.bukkit.Bukkit;
-
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -18,19 +18,16 @@ public class VersionChecker {
 
     public Version foundVersion;
     public VersionChannel channel;
-    private int scheduledTask;
-
     public VersionChecker(VersionChannel channel) {
         this.channel = channel;
-        scheduledTask = Bukkit.getScheduler().scheduleSyncRepeatingTask(BetterKeepInventory.getInstance(), () ->
-                        Bukkit.getScheduler().runTaskAsynchronously(BetterKeepInventory.getInstance(), () -> {
-                            try {
-                                foundVersion = getLatestVersion(channel);
-                            } catch (IOException e) {
-                                BetterKeepInventory.getInstance().log("Failed to check for updates: " + e.getMessage());
-                            }
-                        })
-                , 0L, 20L * 14400); // every 4 hours
+
+        BetterKeepInventory.getScheduler().getScheduler().runTimerAsync(() -> {
+            try {
+                foundVersion = getLatestVersion(channel);
+            } catch (IOException e) {
+                BetterKeepInventory.getInstance().log("Failed to check for updates: " + e.getMessage());
+            }
+        }, 0L, 20L * 14400); // Using every 4 hours
     }
 
     public boolean IsUpdateAvailable() {
@@ -86,6 +83,7 @@ public class VersionChecker {
     }
 
     public void CancelCheck() {
-        Bukkit.getScheduler().cancelTask(scheduledTask);
+        BetterKeepInventory.getScheduler().getScheduler().cancelAllTasks();
+
     }
 }

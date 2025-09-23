@@ -5,10 +5,12 @@ api-version: 1.19
 prefix: BetterKeepInventory
 authors: [ BeepSterr ]
 website: leafcat.live
-
 description: Customize the KeepInventory behavior on your server with rules and conditions.
 
 softdepend: [Vault,Towny,Essentials,GriefPrevention,PlaceholderAPI]
+
+# Folia
+folia-supported: true
 
 # AutoPlug
 spigot-id: 93081

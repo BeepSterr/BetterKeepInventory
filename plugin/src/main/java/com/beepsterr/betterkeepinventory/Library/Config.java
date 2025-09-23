@@ -44,8 +44,8 @@ public class Config {
         this.rawConfig = config;
 
 
-        if(Objects.equals(this.rawConfig.getString("version"), "default")) {
-            plugin.log("Creating defalt config.yml file");
+        if(Objects.equals(this.rawConfig.getString("version", "default"), "default")) {
+            plugin.log("Creating default config.yml file");
             plugin.saveDefaultConfig();
             plugin.reloadConfig();
             this.rawConfig = plugin.getConfig();
