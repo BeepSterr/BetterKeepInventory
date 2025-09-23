@@ -62,18 +62,16 @@ jobs:
           TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           BASE_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
-          SNAPSHOT_TAG="SNAPSHOT"
-          REPO="${{ github.repository }}"
-          TOKEN="${{ secrets.GITHUB_TOKEN }}"
+          DATE=$(date +'%y%m%d') # Format: YYMMDD
           API_URL="https://api.github.com/repos/${REPO}/actions/artifacts"
-
-          # Count matching snapshot builds
+          
+          # Count matching snapshot builds for the current date
           BUILD_COUNT=$(curl -s -H "Authorization: Bearer $TOKEN" "$API_URL" \
-            | jq "[.artifacts[] | select(.name | startswith(\"BetterKeepInventory-${BASE_VERSION}-${SNAPSHOT_TAG}\"))] | length")
-
+            | jq "[.artifacts[] | select(.name | startswith(\"BetterKeepInventory-${BASE_VERSION}-SNAPSHOT-${DATE}\"))] | length")
+          
           BUILD_COUNT=$((BUILD_COUNT + 1))
-          VERSION="${BASE_VERSION}-${SNAPSHOT_TAG}-${BUILD_COUNT}"
-
+          VERSION="${BASE_VERSION}-SNAPSHOT-${DATE}${BUILD_COUNT}"
+          
           echo "Generated version: $VERSION"
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
 
