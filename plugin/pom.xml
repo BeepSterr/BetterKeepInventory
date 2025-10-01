@@ -141,36 +141,17 @@
                             <relocations>
                                 <relocation>
                                     <pattern>org.bstats</pattern>
-                                    <shadedPattern>com.beepsterr.plugins.BetterKeepInventory</shadedPattern>
+                                    <shadedPattern>com.beepsterr.plugins.BetterKeepInventory.bstats</shadedPattern>
+                                </relocation>
+                                <relocation>
+                                    <pattern>com.tcoded.folialib</pattern>
+                                    <shadedPattern>com.beepsterr.lib.folialib</shadedPattern>
                                 </relocation>
                             </relocations>
                         </configuration>
                     </execution>
                 </executions>
             </plugin>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-shade-plugin</artifactId>
-                <version>3.6.0</version>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>shade</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <relocations>
-                        <relocation>
-                            <pattern>com.tcoded.folialib</pattern>
-                            <shadedPattern>com.beepsterr.lib.folialib</shadedPattern>
-                        </relocation>
-                    </relocations>
-                </configuration>
-            </plugin>
-
         </plugins>
         <resources>
             <resource>
