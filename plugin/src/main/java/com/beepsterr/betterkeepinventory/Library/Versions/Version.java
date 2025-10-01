@@ -55,6 +55,12 @@ public class Version implements Comparable<Version> {
         if (this.major != other.major) return Integer.compare(this.major, other.major);
         if (this.minor != other.minor) return Integer.compare(this.minor, other.minor);
         if (this.patch != other.patch) return Integer.compare(this.patch, other.patch);
+        // Compare flavor: STABLE is considered newer than any other flavor
+        if (!this.flavor.equals(other.flavor)) {
+            if (this.flavor.equals("STABLE")) return 1;
+            if (other.flavor.equals("STABLE")) return -1;
+            return this.flavor.compareTo(other.flavor);
+        }
         return Integer.compare(this.build, other.build);
     }
 
