@@ -81,7 +81,7 @@ jobs:
           mvn versions:set -DnewVersion=${{ steps.versioning.outputs.version }} -DgenerateBackupPoms=false
 
       - name: Build project
-        run: mvn clean package -DskipTests
+        run: mvn versions:update-child-modules clean compile package verify -DskipTests -f pom.xml
 
       - name: Rename JAR
         run: |
