@@ -147,7 +147,7 @@ public class DamageItemEffect implements Effect {
         return switch (mode) {
             case SIMPLE -> (int) (min + (max - min) * rng.nextDouble());
             case PERCENTAGE -> (int) (maxDurability * ((min + (max - min) * rng.nextDouble()) / 100.0));
-            case PERCENTAGE_REMAINING -> (int) (currentDamageTaken * ((min + (max - min) * rng.nextDouble()) / 100.0));
+            case PERCENTAGE_REMAINING -> (int) ((maxDurability - currentDamageTaken) * ((min + (max - min) * rng.nextDouble()) / 100.0));
         };
     }
 
