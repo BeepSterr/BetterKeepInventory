@@ -86,7 +86,7 @@ jobs:
       - name: Rename JAR
         run: |
           mkdir out
-          mv ./plugin/target/BetterKeepInventory-*-shaded.jar ./out/BetterKeepInventory-${{ steps.versioning.outputs.version }}.jar
+          mv ./plugin/target/BetterKeepInventory-${{ steps.versioning.outputs.version }}-shaded.jar ./out/BetterKeepInventory-${{ steps.versioning.outputs.version }}.jar
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
