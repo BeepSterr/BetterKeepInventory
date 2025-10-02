@@ -5,10 +5,7 @@ import com.beepsterr.betterkeepinventory.Content.Conditions.PermissionsCondition
 import com.beepsterr.betterkeepinventory.Content.Conditions.PlaceholderAPI.PlaceholderCondition;
 import com.beepsterr.betterkeepinventory.Content.Conditions.Vault.VaultCondition;
 import com.beepsterr.betterkeepinventory.Content.Conditions.WorldsCondition;
-import com.beepsterr.betterkeepinventory.Content.Effects.DamageItemEffect;
-import com.beepsterr.betterkeepinventory.Content.Effects.DropItemEffect;
-import com.beepsterr.betterkeepinventory.Content.Effects.ExpEffect;
-import com.beepsterr.betterkeepinventory.Content.Effects.HungerEffect;
+import com.beepsterr.betterkeepinventory.Content.Effects.*;
 import com.beepsterr.betterkeepinventory.Content.Effects.Vault.VaultEffect;
 import com.beepsterr.betterkeepinventory.Depends.BetterKeepInventoryPlaceholderExpansion;
 import com.beepsterr.betterkeepinventory.Events.OnPlayerDeath;
@@ -113,6 +110,8 @@ public final class BetterKeepInventory extends JavaPlugin implements Listener {
         api.effectRegistry().register(this, "drop", DropItemEffect::new);
         api.effectRegistry().register(this, "exp", ExpEffect::new);
         api.effectRegistry().register(this, "hunger", HungerEffect::new);
+        api.effectRegistry().register(this, "kick", KickEffect::new);
+        api.effectRegistry().register(this, "ban", BanEffect::new);
 
         if(checkDependency("Vault")){
             api.effectRegistry().register(this, "vault", VaultEffect::new);
