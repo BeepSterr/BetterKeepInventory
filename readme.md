@@ -53,7 +53,7 @@ The easiest way to get a hold of the API is to use JitPack. Just add your depend
         <!-- Keep not that we're using the 'betterkeepinventory-api' artifact -->
         <groupId>com.github.BeepSterr.BetterKeepInventory</groupId>
         <artifactId>betterkeepinventory-api</artifactId>
-        <version>v2.0.0-BETA-1</version>
+        <version>v2.0.0</version>
         <!-- You should not shade the API, but use it as a provided dependency -->
         <!-- If you don't do this, you will not be able to register anything -->
         <scope>provided</scope>
@@ -75,7 +75,7 @@ public static class AlwaysTrueCondition implements Condition {
 
     @Override
     public boolean check(Player player, PlayerDeathEvent deathEvent, PlayerRespawnEvent respawnEvent) {
-        return false;
+        return true;
     }
 }
 ```
