@@ -7,6 +7,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -23,7 +24,7 @@ public class OnPlayerDeath  implements Listener {
         plugin = main;
     }
 
-    @EventHandler(ignoreCancelled = true)
+    @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
     public void onPlayerDeath(PlayerDeathEvent event) {
 
         Player ply = event.getEntity();
@@ -50,45 +51,6 @@ public class OnPlayerDeath  implements Listener {
         // Time to process the top level rules
         for(ConfigRule rule : plugin.config.getRules()){
             rule.trigger(ply, event, null);
-        }
-
-    }
-
-    @EventHandler(ignoreCancelled = true)
-    public void onPlayerRespawn(PlayerRespawnEvent event) {
-
-        // Time to process the top level rules
-        for(ConfigRule rule : plugin.config.getRules()){
-            rule.trigger(event.getPlayer(), null, event);
-        }
-    }
-
-    @EventHandler(ignoreCancelled = true)
-    public void onPlayerJoin(PlayerJoinEvent event) {
-
-        Player ply = event.getPlayer();
-        if(ply.hasPermission("betterkeepinventory.version.notify")){
-            BetterKeepInventory.getScheduler().getScheduler().runAsync((consumer) -> {
-
-                try{
-                    // Yes, We're using Thread.sleep.
-                    // I Don't think FoliaLib has a way to schedule delayed tasks at this point.
-                    // I didn't want to spend a lot of time figuring out a way to do it the right way
-                    // And since this is a thread that only gets spawned when "admin" players join
-                    // It's a non-issue for now.
-                    Thread.sleep(1000*5);
-                }catch(InterruptedException e){
-                    Thread.currentThread().interrupt();
-                }
-
-
-                if(plugin.versionChecker != null && plugin.versionChecker.IsUpdateAvailable()) {
-                    // Send a message to the player
-                    ply.sendMessage(ChatColor.YELLOW + "A new version of BetterKeepInventory is available!");
-                    ply.sendMessage(ChatColor.GREEN + plugin.versionChecker.foundVersion.toString() + ChatColor.YELLOW + " (Installed: " + plugin.version.toString() + ")");
-                }
-            });
-
         }
 
     }

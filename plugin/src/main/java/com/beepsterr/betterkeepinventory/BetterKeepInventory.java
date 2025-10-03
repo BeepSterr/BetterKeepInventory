@@ -9,6 +9,8 @@ import com.beepsterr.betterkeepinventory.Content.Effects.*;
 import com.beepsterr.betterkeepinventory.Content.Effects.Vault.VaultEffect;
 import com.beepsterr.betterkeepinventory.Depends.BetterKeepInventoryPlaceholderExpansion;
 import com.beepsterr.betterkeepinventory.Events.OnPlayerDeath;
+import com.beepsterr.betterkeepinventory.Events.OnPlayerJoin;
+import com.beepsterr.betterkeepinventory.Events.OnPlayerRespawn;
 import com.beepsterr.betterkeepinventory.Exceptions.UnloadableConfiguration;
 import com.beepsterr.betterkeepinventory.Library.Config;
 import com.beepsterr.betterkeepinventory.Library.MetricContainer;
@@ -71,6 +73,8 @@ public final class BetterKeepInventory extends JavaPlugin implements Listener {
 
         // event handlers
         getServer().getPluginManager().registerEvents(new OnPlayerDeath(this), this);
+        getServer().getPluginManager().registerEvents(new OnPlayerRespawn(this), this);
+        getServer().getPluginManager().registerEvents(new OnPlayerJoin(this), this);
 
         // Command registration
         Objects.requireNonNull(this.getCommand("betterkeepinventory")).setExecutor(new MainCommand());
