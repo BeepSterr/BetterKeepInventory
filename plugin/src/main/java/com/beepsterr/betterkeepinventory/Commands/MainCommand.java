@@ -21,7 +21,7 @@ import java.util.*;
 public class MainCommand implements CommandExecutor, TabCompleter {
 
     private boolean checkPerm(CommandSender sender, String permission) {
-        return sender.hasPermission(permission) || sender instanceof org.bukkit.command.ConsoleCommandSender;
+        return sender.hasPermission(permission) || sender instanceof ConsoleCommandSender;
     }
 
     @Override
@@ -31,6 +31,7 @@ public class MainCommand implements CommandExecutor, TabCompleter {
             return switch (args[0]) {
                 case "reload" -> OnReloadCommand(sender, command, label, args);
                 case "registry" -> OnRegistryCommand(sender, command, label, args);
+                case "debug" -> OnDebugCommand(sender, command, label, args);
                 default -> {
                     sender.sendMessage(ChatColor.RED + "Unknown command. Use /betterkeepinventory for help.");
                     yield true;
@@ -120,6 +121,7 @@ public class MainCommand implements CommandExecutor, TabCompleter {
                 reloadCommand.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/betterkeepinventory reload"));
                 sender.spigot().sendMessage(reloadCommand);
             }
+
             if(checkPerm(sender, "betterkeepinventory.command.registry")){
                 TextComponent registryEffectsCommand = new TextComponent("/betterki registry effects");
                 registryEffectsCommand.setColor(ChatColor.AQUA);
@@ -132,6 +134,12 @@ public class MainCommand implements CommandExecutor, TabCompleter {
                 sender.spigot().sendMessage(registryConditionsCommand);
             }
 
+            if(checkPerm(sender, "betterkeepinventory.command.debug.upload")){
+                TextComponent registryEffectsCommand = new TextComponent("/betterki debug upload");
+                registryEffectsCommand.setColor(ChatColor.AQUA);
+                registryEffectsCommand.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/betterkeepinventory debug upload"));
+                sender.spigot().sendMessage(registryEffectsCommand);
+            }
 
         }
 
@@ -243,7 +251,7 @@ public class MainCommand implements CommandExecutor, TabCompleter {
         plugin.reloadConfig();
 
         try {
-            plugin.config = new Config(plugin.getConfig());
+            plugin.config = new Config(plugin.getConfig(), null);
         }catch (UnloadableConfiguration e) {
 
             String alert = "\n"
@@ -273,6 +281,47 @@ public class MainCommand implements CommandExecutor, TabCompleter {
 
     }
 
+    public boolean OnDebugCommand(CommandSender sender, Command command, String label, String[] args){
+
+        if(!checkPerm(sender, "betterkeepinventory.command.debug")){
+            sender.sendMessage(ChatColor.RED + "You do not have permission to use this command.");
+            return true;
+        }
+
+        if(args.length > 1){
+            return switch (args[1]) {
+                case "upload" -> OnDebugUploadCommand(sender, command, label, args);
+                default -> {
+                    sender.sendMessage(ChatColor.RED + "Unknown command. Use /betterkeepinventory for help.");
+                    yield true;
+                }
+            };
+        }
+
+        sender.sendMessage(ChatColor.RED + "Unknown command. Use /betterkeepinventory for help.");
+        return true;
+
+    }
+
+    public boolean OnDebugUploadCommand(CommandSender sender, Command command, String label, String[] args){
+
+        if(!checkPerm(sender, "betterkeepinventory.command.debug.upload")){
+            sender.sendMessage(ChatColor.RED + "You do not have permission to use this command.");
+            return true;
+        }
+
+        String key = BetterKeepInventory.getInstance().debugger.TriggerUpload();
+
+        TextComponent textComponent = new TextComponent("Uploaded! https://bin.lunega.dev/" + key + " (click to copy URL)");
+        textComponent.setColor(ChatColor.GREEN);
+        textComponent.setClickEvent(new ClickEvent(ClickEvent.Action.COPY_TO_CLIPBOARD, "https://bin.lunega.dev/" + key ));
+
+        sender.spigot().sendMessage(textComponent);
+
+        return true;
+
+    }
+
     // TODO: implement new permissions
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
@@ -282,6 +331,7 @@ public class MainCommand implements CommandExecutor, TabCompleter {
             List<String> options = new ArrayList<>();
             if (sender.hasPermission("betterkeepinventory.command.reload")) options.add("reload");
             if (sender.hasPermission("betterkeepinventory.command.registry")) options.add("registry");
+            if (sender.hasPermission("betterkeepinventory.command.debug")) options.add("debug");
 
             return options.stream()
                     .filter(opt -> opt.startsWith(args[0].toLowerCase()))
@@ -293,6 +343,14 @@ public class MainCommand implements CommandExecutor, TabCompleter {
 
             return List.of("effects", "conditions").stream()
                     .filter(opt -> opt.startsWith(args[1].toLowerCase()))
+                    .toList();
+        }
+
+        if (args.length == 2 && args[0].equalsIgnoreCase("debug")) {
+            if (!sender.hasPermission("betterkeepinventory.command.debug")) return Collections.emptyList();
+
+            return List.of("upload", "verbose").stream()
+                    .filter(opt -> opt.startsWith(args[1].toLowerCase()) && sender.hasPermission("betterkeepinventory.command.debug." + opt))
                     .toList();
         }
 

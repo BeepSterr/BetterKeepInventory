@@ -13,23 +13,27 @@ import org.bukkit.event.player.PlayerRespawnEvent;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
 
 public class ConfigRule {
 
     private final String name;
     private final boolean enabled;
     private final ConfigRule parent;
+    private final NestedLogBuilder nlb;
 
     private List<Condition> conditions = new ArrayList<>();
     private final List<Effect> effects = new ArrayList<>();
 
     private final List<ConfigRule> children = new ArrayList<>();
 
-    public ConfigRule(ConfigurationSection config, ConfigRule parent) {
+    public ConfigRule(ConfigurationSection config, ConfigRule parent, NestedLogBuilder nlb) {
 
         this.parent = parent;
         this.name = config.getString("name", "Unnamed Rule");
         this.enabled = config.getBoolean("enabled", false);
+        this.nlb = nlb != null ? nlb : new NestedLogBuilder(Level.FINE);
+        this.nlb.child("Rule '" + name + "'");
 
         var api = Bukkit.getServer().getServicesManager().load(BetterKeepInventoryAPI.class);
         if(api == null){
@@ -40,18 +44,24 @@ public class ConfigRule {
         if (config.isConfigurationSection("conditions")) {
             var condSection = config.getConfigurationSection("conditions");
             assert condSection != null;
+
+            this.nlb.child("Conditions (" + condSection.getKeys(false).size() + ")");
             for (String key : condSection.getKeys(false))
             {
-                BetterKeepInventory.getInstance().debug("Trying Condition '" + key + "'");
 
+                this.nlb.log("Parsing condition '" + key + "'");
                 if (!api.conditionRegistry().has(key)) {
-                    BetterKeepInventory.getInstance().debug("Condition '" + key + "' is not registered. Triggered in rule '" + name + ". Skipping.'");
+                    this.nlb.cont(Level.WARNING, "'" + key + "' is not a registered condition");
+                    this.nlb.cont(Level.WARNING, "Either you need a plugin to provide it, or it does not exist");
+                    this.nlb.cont("This condition is being treated as if it does not exist (skipping)");
                     continue;
                 }
 
                 ConfigurationSection section = condSection.getConfigurationSection(key);
                 if (section == null) {
-                    BetterKeepInventory.getInstance().debug("Condition '" + key + "' is missing configuration section in rule '" + name + "'. Skipping.");
+                    this.nlb.cont(Level.WARNING, "'" + key + "' is not configured properly.");
+                    this.nlb.cont(Level.WARNING, "Either you did not provide a configuration section, or it is malformed.");
+                    this.nlb.cont("This condition is being treated as if it does not exist (skipping)");
                     continue;
                 }
 
@@ -59,29 +69,43 @@ public class ConfigRule {
                     Condition cond = api.conditionRegistry().get(key).create(section);
                     conditions.add(cond);
                 }catch(ConditionParseError e){
-                    BetterKeepInventory.getInstance().getLogger().warning("Condition '" + key + "' could not be parsed");
-                    BetterKeepInventory.getInstance().getLogger().warning("Error: " + e.getMessage());
+                    this.nlb.cont(Level.WARNING, "'" + key + "' could not be parsed.");
+                    this.nlb.cont(Level.WARNING, "The configuration is malformed.");
+                    this.nlb.cont(e.getMessage());
                 }
             }
+            this.nlb.parent();
+        }else{
+            this.nlb.log("No conditions defined in this rule.");
         }
 
 
         // Parse effects
         ConfigurationSection effectSection = config.getConfigurationSection("effects");
         if (effectSection != null) {
+            this.nlb.child("Effects (" + effectSection.getKeys(false).size() + ")");
             for (String key : effectSection.getKeys(false)) {
+
+                this.nlb.log("Parsing effect '" + key + "'");
                 ConfigurationSection effConfig = effectSection.getConfigurationSection(key);
                 if (effConfig == null) continue;
 
                 Effect effect = api.effectRegistry().create(key, effConfig);
                 if (effect == null){
-                    BetterKeepInventory.getInstance().getLogger().warning("Effect '" + key + "' is not registered. Triggered in rule '" + name + "'!!!");
+                    this.nlb.cont(Level.WARNING, "'" + key + "' is not a registered effect");
+                    this.nlb.cont(Level.WARNING, "Either you need a plugin to provide it, or it does not exist");
+                    this.nlb.cont("This effect is being treated as if it does not exist (skipping)");
                     continue;
                 }
 
                 effects.add(effect);
             }
+            this.nlb.parent();
+        }else{
+            this.nlb.log("No effects defined in this rule.");
         }
+
+        this.nlb.spacer();
 
         // Parse children
         ConfigurationSection childrenSection = config.getConfigurationSection("children");
@@ -89,10 +113,13 @@ public class ConfigRule {
             for (String childKey : childrenSection.getKeys(false)) {
                 ConfigurationSection childConfig = childrenSection.getConfigurationSection(childKey);
                 if (childConfig != null) {
-                    children.add(new ConfigRule(childConfig, this));
+                    children.add(new ConfigRule(childConfig, this, this.nlb));
                 }
             }
         }
+
+        this.nlb.parent();
+
     }
 
     public String getName() {
@@ -103,10 +130,11 @@ public class ConfigRule {
         return enabled;
     }
 
+
     public void trigger(Player ply, PlayerDeathEvent deathEvent, PlayerRespawnEvent respawnEvent) {
         BetterKeepInventory plugin = BetterKeepInventory.getInstance();
 
-        if (!enabled) {
+        if (!isEnabled()) {
             plugin.debug(ply, "Rule " + this + " was skipped (not enabled)");
             return;
         }
@@ -138,6 +166,9 @@ public class ConfigRule {
         } else {
             plugin.debug(ply, "Rule " + this + " was skipped (conditions not met)");
         }
+
+        this.nlb.parent();
+
     }
 
     @Override
