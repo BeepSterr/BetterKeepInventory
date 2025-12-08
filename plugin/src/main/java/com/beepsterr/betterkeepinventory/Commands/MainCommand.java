@@ -142,6 +142,13 @@ public class MainCommand implements CommandExecutor, TabCompleter {
                 sender.spigot().sendMessage(registryEffectsCommand);
             }
 
+            if(checkPerm(sender, "betterkeepinventory.command.debug.verbose")){
+                TextComponent registryEffectsCommand = new TextComponent("/betterki debug verbose");
+                registryEffectsCommand.setColor(ChatColor.AQUA);
+                registryEffectsCommand.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/betterkeepinventory debug verbose"));
+                sender.spigot().sendMessage(registryEffectsCommand);
+            }
+
         }
 
         return true;

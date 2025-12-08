@@ -10,6 +10,10 @@ import org.bukkit.entity.Player;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.TimeZone;
 import java.util.UUID;
 
 public class Debugger {
@@ -25,13 +29,20 @@ public class Debugger {
     }
 
     private String getHeader(){
+
+        TimeZone tz = TimeZone.getTimeZone("UTC");
+        DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm'Z'"); // Quoted "Z" to indicate UTC, no timezone offset
+        df.setTimeZone(tz);
+        String nowAsISO = df.format(new Date());
+
         String header = "=== SYSTEM INFO";
-        header += "\nBukkit Version: " + Bukkit.getVersion();
-        header += "\nMinecraft Version: " + Bukkit.getBukkitVersion();
+        header += "\nServer Implementation: " + Bukkit.getServer().getClass().getPackage().getName() + " (" + BetterKeepInventory.getScheduler().getImplType().toString() + ")";
+        header += "\nServer Version: " + Bukkit.getVersion();
         header += "\nPlugin Version: " + BetterKeepInventory.getInstance().getDescription().getVersion();
         header += "\nJava Version: " + System.getProperty("java.version");
         header += "\nOS: " + System.getProperty("os.name") + " "+ System.getProperty("os.version") + " (" + System.getProperty("os.arch") + ")";
         header += "\nCPU Cores: " + Runtime.getRuntime().availableProcessors();
+        header += "\nTime: " + nowAsISO;
         return header;
     }
 
@@ -49,7 +60,7 @@ public class Debugger {
     }
 
     public void reset() {
-        this.messages = new String[100];
+        this.messages = new String[MAX_MESSAGES];
     }
 
     public String TriggerUpload(){
@@ -73,11 +84,17 @@ public class Debugger {
     }
 
     public void AddLine(String line) {
+        if (nextIndex >= MAX_MESSAGES) {
+            nextIndex = 0; // safety reset :3c
+        }
+
         messages[nextIndex] = line;
+
         nextIndex = (nextIndex + 1) % MAX_MESSAGES;
         if (messageCount < MAX_MESSAGES) {
             messageCount++;
         }
+
         Broadcast(line);
     }
 
