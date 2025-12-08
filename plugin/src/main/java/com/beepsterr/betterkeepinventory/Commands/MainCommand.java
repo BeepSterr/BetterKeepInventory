@@ -15,6 +15,7 @@ import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.command.*;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import java.util.*;
 
@@ -291,6 +292,7 @@ public class MainCommand implements CommandExecutor, TabCompleter {
         if(args.length > 1){
             return switch (args[1]) {
                 case "upload" -> OnDebugUploadCommand(sender, command, label, args);
+                case "verbose" -> OnDebugVerboseCommand(sender, command, label, args);
                 default -> {
                     sender.sendMessage(ChatColor.RED + "Unknown command. Use /betterkeepinventory for help.");
                     yield true;
@@ -310,13 +312,46 @@ public class MainCommand implements CommandExecutor, TabCompleter {
             return true;
         }
 
-        String key = BetterKeepInventory.getInstance().debugger.TriggerUpload();
+        sender.sendMessage(ChatColor.GRAY + "Generating...");
+        try{
+            BetterKeepInventory.getInstance().debugger.write();
+        }catch (RuntimeException e){
+            sender.sendMessage(ChatColor.RED + "Error: " + e.getMessage());
+            return true;
+        }
 
-        TextComponent textComponent = new TextComponent("Uploaded! https://bin.lunega.dev/" + key + " (click to copy URL)");
-        textComponent.setColor(ChatColor.GREEN);
-        textComponent.setClickEvent(new ClickEvent(ClickEvent.Action.COPY_TO_CLIPBOARD, "https://bin.lunega.dev/" + key ));
+        sender.sendMessage(ChatColor.GRAY + "Uploading...");
+        try {
+            String key = BetterKeepInventory.getInstance().debugger.upload();
+            TextComponent textComponent = new TextComponent("Uploaded! https://bin.lunega.dev/" + key + " (click to copy URL)");
+            textComponent.setColor(ChatColor.GREEN);
+            textComponent.setClickEvent(new ClickEvent(ClickEvent.Action.COPY_TO_CLIPBOARD, "https://bin.lunega.dev/" + key ));
+            sender.spigot().sendMessage(textComponent);
+        }catch (Exception e){
+            sender.sendMessage(ChatColor.RED + "Error: " + e.getMessage());
+            return true;
+        }
 
-        sender.spigot().sendMessage(textComponent);
+
+        return true;
+
+    }
+
+    public boolean OnDebugVerboseCommand(CommandSender sender, Command command, String label, String[] args){
+
+        if(!(sender instanceof Player)){
+            sender.sendMessage(ChatColor.RED + "Only players can use this command.");
+            return true;
+        }
+
+        if(!checkPerm(sender, "betterkeepinventory.command.debug.verbose")){
+            sender.sendMessage(ChatColor.RED + "You do not have permission to use this command.");
+            return true;
+        }
+
+        sender.sendMessage(ChatColor.GRAY + "Toggling verbose debug mode...");
+        BetterKeepInventory plugin = BetterKeepInventory.getInstance();
+        plugin.debugger.toggleVerbosePlayer((Player) sender);
 
         return true;
 

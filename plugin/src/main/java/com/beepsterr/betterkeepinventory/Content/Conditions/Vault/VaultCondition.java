@@ -3,6 +3,7 @@ package com.beepsterr.betterkeepinventory.Content.Conditions.Vault;
 import com.beepsterr.betterkeepinventory.BetterKeepInventory;
 import com.beepsterr.betterkeepinventory.Depends.Vault;
 import com.beepsterr.betterkeepinventory.api.Condition;
+import com.beepsterr.betterkeepinventory.api.LoggerInterface;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.PlayerDeathEvent;
@@ -17,7 +18,7 @@ public class VaultCondition implements Condition {
     }
 
     @Override
-    public boolean check(Player ply, PlayerDeathEvent deathEvent, PlayerRespawnEvent respawnEvent) {
+    public boolean check(Player ply, PlayerDeathEvent deathEvent, PlayerRespawnEvent respawnEvent, LoggerInterface logger) {
         BetterKeepInventory.getInstance().debug(ply, "Checking economy condition: Minimum balance required = " + minBalance);
         Vault vault = new Vault(BetterKeepInventory.getInstance());
         return vault.getPlayerBalance(ply) >= minBalance;

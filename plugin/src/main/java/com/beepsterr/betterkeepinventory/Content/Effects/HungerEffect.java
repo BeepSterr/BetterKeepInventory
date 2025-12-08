@@ -2,6 +2,7 @@ package com.beepsterr.betterkeepinventory.Content.Effects;
 
 import com.beepsterr.betterkeepinventory.BetterKeepInventory;
 import com.beepsterr.betterkeepinventory.api.Effect;
+import com.beepsterr.betterkeepinventory.api.LoggerInterface;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
@@ -24,7 +25,7 @@ public class HungerEffect implements Effect {
     }
 
     @Override
-    public void onDeath(Player ply, PlayerDeathEvent event) {
+    public void onDeath(Player ply, PlayerDeathEvent event, LoggerInterface logger) {
         int currentHunger = ply.getFoodLevel();
         int newHunger = Math.max(currentHunger - amount, min);
         hungerMap.put(ply.getUniqueId(), newHunger);
@@ -32,7 +33,7 @@ public class HungerEffect implements Effect {
     }
 
     @Override
-    public void onRespawn(Player ply, PlayerRespawnEvent event) {
+    public void onRespawn(Player ply, PlayerRespawnEvent event, LoggerInterface logger) {
         Bukkit.getScheduler().runTaskLater(BetterKeepInventory.getInstance(), () -> {
             Integer saved = hungerMap.remove(ply.getUniqueId());
             if (saved != null) {

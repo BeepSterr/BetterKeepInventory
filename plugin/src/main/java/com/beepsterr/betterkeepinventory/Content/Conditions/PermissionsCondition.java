@@ -1,6 +1,7 @@
 package com.beepsterr.betterkeepinventory.Content.Conditions;
 
 import com.beepsterr.betterkeepinventory.api.Condition;
+import com.beepsterr.betterkeepinventory.api.LoggerInterface;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.PlayerDeathEvent;
@@ -17,7 +18,7 @@ public class PermissionsCondition implements Condition {
     }
 
     @Override
-    public boolean check(Player ply, PlayerDeathEvent deathEvent, PlayerRespawnEvent respawnEvent) {
+    public boolean check(Player ply, PlayerDeathEvent deathEvent, PlayerRespawnEvent respawnEvent, LoggerInterface logger) {
         for (String perm : permissions) {
             boolean negated = perm.startsWith("!");
             String actual = negated ? perm.substring(1) : perm;

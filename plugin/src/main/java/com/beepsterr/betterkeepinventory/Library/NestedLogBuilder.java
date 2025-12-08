@@ -1,11 +1,12 @@
 package com.beepsterr.betterkeepinventory.Library;
 
 import com.beepsterr.betterkeepinventory.BetterKeepInventory;
+import com.beepsterr.betterkeepinventory.api.LoggerInterface;
 import net.md_5.bungee.api.ChatColor;
 
 import java.util.logging.Level;
 
-public class NestedLogBuilder {
+public class NestedLogBuilder implements LoggerInterface {
 
     public static final String LOG_ROOT             = "┌";
     public static final String LOG_SPACER           = "│";
@@ -52,13 +53,14 @@ public class NestedLogBuilder {
             return;
         }
 
-        String msg = getPrefix(this.level).replace(LOG_ENTRY, LOG_CHILD) + " ";
+        String msg = getPrefix().replace(LOG_ENTRY, LOG_CHILD) + " ";
         if(title == null || title.isEmpty()){
             msg = msg.replace(LOG_CHILD, LOG_CHILD_NO_TEXT);
         }else{
             msg += title;
         }
         logger.log(this.level, msg);
+        BetterKeepInventory.getInstance().debugger.AddLine(msg);
         depth++;
 
     }
@@ -74,26 +76,31 @@ public class NestedLogBuilder {
     public void log(Level level, String message){
         String msg = getPrefix() + " " + message;
         logger.log(level, msg);
+        BetterKeepInventory.getInstance().debugger.AddLine(msg);
     }
 
     public void log(String message){
         String msg = getPrefix() + " " + message;
         logger.log(this.level, msg);
+        BetterKeepInventory.getInstance().debugger.AddLine(msg);
     }
 
     public void cont(Level level, String message){
         String msg = getPrefix().replace(LOG_ENTRY, LOG_SPACER) + " " + message;
         logger.log(level, msg);
+        BetterKeepInventory.getInstance().debugger.AddLine(msg);
     }
 
     public void cont(String message){
         String msg = getPrefix().replace(LOG_ENTRY, LOG_SPACER) + " " + message;
         logger.log(this.level, msg);
+        BetterKeepInventory.getInstance().debugger.AddLine(msg);
     }
 
     public void spacer(){
         String msg = getPrefix().replace(LOG_ENTRY, LOG_SPACER) + " ";
         logger.log(this.level, msg);
+        BetterKeepInventory.getInstance().debugger.AddLine(msg);
     }
 
     public void end(){
@@ -102,6 +109,7 @@ public class NestedLogBuilder {
         }
         String msg = getPrefix().replace(LOG_ENTRY, LOG_END);
         logger.log(this.level, msg);
+        BetterKeepInventory.getInstance().debugger.AddLine(msg);
     }
 
 }

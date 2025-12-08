@@ -3,6 +3,7 @@ package com.beepsterr.betterkeepinventory.Events;
 import com.beepsterr.betterkeepinventory.BetterKeepInventory;
 import com.beepsterr.betterkeepinventory.Library.ConfigRule;
 import com.beepsterr.betterkeepinventory.Library.NestedLogBuilder;
+import org.bukkit.GameRule;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -30,7 +31,7 @@ public class OnPlayerDeath  implements Listener {
         nlb.log("Player" + ply.getName() + " (" + ply.getUniqueId() + ") died.");
         nlb.spacer();
         nlb.cont("Phase 1/2 (Death)");
-        nlb.cont("World: " + ply.getWorld().getName());
+        nlb.cont("World: " + ply.getWorld().getName() + " ( KI: " + ply.getWorld().getGameRuleValue(GameRule.KEEP_INVENTORY) + ")");
         nlb.cont("Behavior: " + plugin.config.getDefaultBehavior().toString());
         nlb.spacer();
 

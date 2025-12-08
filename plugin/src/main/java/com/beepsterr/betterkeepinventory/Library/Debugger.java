@@ -5,13 +5,16 @@ import org.bukkit.Bukkit;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import org.bukkit.entity.Player;
 
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.UUID;
 
 public class Debugger {
 
+    private final java.util.List<String> verboseTargets = new java.util.ArrayList<>();
     private static final int MAX_MESSAGES = 1000;
     private String[] messages = new String[MAX_MESSAGES];
     private int messageCount = 0;
@@ -69,7 +72,48 @@ public class Debugger {
         return log;
     }
 
-    private void write() {
+    public void AddLine(String line) {
+        messages[nextIndex] = line;
+        nextIndex = (nextIndex + 1) % MAX_MESSAGES;
+        if (messageCount < MAX_MESSAGES) {
+            messageCount++;
+        }
+        Broadcast(line);
+    }
+
+    private void Broadcast(String message) {
+        for(String target : verboseTargets){
+            Player player = Bukkit.getPlayer(UUID.fromString(target));
+            if(player != null && player.isOnline()){
+                player.sendMessage(message);
+            }
+        }
+    }
+
+    public void toggleVerbosePlayer(Player player){
+        this.toggleVerbosePlayer(player.getUniqueId());
+    }
+
+    public void toggleVerbosePlayer(UUID playerUUID){
+        if(!isVerbose(playerUUID)){
+            verboseTargets.add(playerUUID.toString());
+            BetterKeepInventory.getInstance().getLogger().info("Enabled verbose debugging for player " + playerUUID);
+        } else {
+            verboseTargets.remove(playerUUID.toString());
+            BetterKeepInventory.getInstance().getLogger().info("Disabling verbose debugging for player " + playerUUID);
+        }
+    }
+
+    private boolean isVerbose(UUID playerUUID){
+        for(String target : verboseTargets){
+            if(target.equals(playerUUID.toString())){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public void write() {
 
         String log = getContent();
 
@@ -77,16 +121,16 @@ public class Debugger {
         if (!dataFolder.exists()) {
             dataFolder.mkdirs();
         }
-        File file = new File(dataFolder, "debugger.txt");
+        File file = new File(dataFolder, "debugger.log");
         try (FileWriter writer = new FileWriter(file)) {
             writer.write(log);
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new RuntimeException("Failed to write debugger log to file: " + e.getMessage());
         }
 
     }
 
-    private String upload(){
+    public String upload(){
         String log = getContent();
         try {
             java.net.URL url = new java.net.URL("https://bin.lunega.dev/post");
@@ -108,16 +152,17 @@ public class Debugger {
                         return key;
                     } else {
                         BetterKeepInventory.getInstance().getLogger().warning("Debugger upload succeeded but response did not contain a bin key.");
+                        throw new RuntimeException("Debug data uploaded, but no key was returned. (Are you on a old version?)");
                     }
                 }
             } else {
                 BetterKeepInventory.getInstance().getLogger().warning("Debugger upload failed with HTTP code: " + code);
+                throw new RuntimeException("Debug data upload failed with HTTP code: " + code);
             }
         } catch (Exception e) {
             BetterKeepInventory.getInstance().getLogger().severe("Debugger upload error: " + e.getMessage());
+            throw new RuntimeException("Debug data upload error: " + e.getMessage());
         }
-
-        return null;
 
     }
 

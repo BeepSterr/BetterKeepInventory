@@ -2,6 +2,7 @@ package com.beepsterr.plugin_api_consumer;
 
 import com.beepsterr.betterkeepinventory.api.BetterKeepInventoryAPI;
 import com.beepsterr.betterkeepinventory.api.Condition;
+import com.beepsterr.betterkeepinventory.api.LoggerInterface;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
@@ -15,8 +16,13 @@ public class BKITestPlugin extends JavaPlugin {
     public void onEnable() {
         BetterKeepInventoryAPI api = Bukkit.getServicesManager().load(BetterKeepInventoryAPI.class);
         // don't forget null checks!
-        api.conditionRegistry().register(this, "worlds", AlwaysTrueCondition::new);
-        getLogger().info("✅ Custom test condition registered!");
+        if(api != null){
+            api.conditionRegistry().register(this, "worlds", AlwaysTrueCondition::new);
+            getLogger().info("✅ Custom test condition registered!");
+        }else{
+            getLogger().severe("❌ BetterKeepInventoryAPI service not found!");
+        }
+
     }
 
     public static class AlwaysTrueCondition implements Condition {
@@ -27,7 +33,8 @@ public class BKITestPlugin extends JavaPlugin {
         }
 
         @Override
-        public boolean check(Player player, PlayerDeathEvent deathEvent, PlayerRespawnEvent respawnEvent) {
+        public boolean check(Player player, PlayerDeathEvent deathEvent, PlayerRespawnEvent respawnEvent, LoggerInterface logger) {
+            logger.log("Hello from AlwaysTrueCondition!");
             return false;
         }
     }

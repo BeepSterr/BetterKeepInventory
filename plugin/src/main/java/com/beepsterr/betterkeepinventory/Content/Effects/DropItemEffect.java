@@ -2,6 +2,7 @@ package com.beepsterr.betterkeepinventory.Content.Effects;
 
 import com.beepsterr.betterkeepinventory.BetterKeepInventory;
 import com.beepsterr.betterkeepinventory.Library.Utilities;
+import com.beepsterr.betterkeepinventory.api.LoggerInterface;
 import com.beepsterr.betterkeepinventory.api.Types.MaterialType;
 import com.beepsterr.betterkeepinventory.api.Effect;
 import com.beepsterr.betterkeepinventory.api.Types.SlotType;
@@ -45,12 +46,12 @@ public class DropItemEffect implements Effect {
     }
 
     @Override
-    public void onRespawn(Player ply, PlayerRespawnEvent event) {
+    public void onRespawn(Player ply, PlayerRespawnEvent event, LoggerInterface logger) {
         // Nothing on respawn
     }
 
     @Override
-    public void onDeath(Player ply, PlayerDeathEvent event) {
+    public void onDeath(Player ply, PlayerDeathEvent event, LoggerInterface logger) {
         BetterKeepInventory plugin = BetterKeepInventory.getInstance();
         Random rng = plugin.rng;
 
@@ -66,24 +67,24 @@ public class DropItemEffect implements Effect {
 
             // Check the filters
             if (!dropItems.isEmpty() && !this.items.isIncludeAll() && !dropItems.contains(item.getType())){
-                plugin.debug(ply, "Drop skipped due to item filter: " + item.getType());
+                logger.log("Drop skipped due to item filter: " + item.getType());
                 continue;
             };
             if (!dropSlots.isEmpty() && !dropSlots.contains(i)){
-                plugin.debug(ply, "Drop skipped due to slot filter: " + item.getType() + " at slot " + i);
+                logger.log("Drop skipped due to slot filter: " + item.getType() + " at slot " + i);
                 continue;
             };
 
             if(meta != null){
                 if (!nameFilters.isEmpty() && !Utilities.advancedStringCompare(meta.getDisplayName(), nameFilters)){
-                    plugin.debug(ply, "Drop skipped due to name filter: " + item.getType() + " with name " + meta.getDisplayName());
+                    logger.log("Drop skipped due to name filter: " + item.getType() + " with name " + meta.getDisplayName());
                     continue;
                 };
                 if(meta.getLore() != null){
                     boolean loreFilterMatched = false;
                     for( String lore : meta.getLore()){
                         if (!loreFilters.isEmpty() && !Utilities.advancedStringCompare(lore, loreFilters)) {
-                            plugin.debug(ply, "Drop skipped due to lore filter: " + item.getType() + " with lore " + lore);
+                            logger.log("Drop skipped due to lore filter: " + item.getType() + " with lore " + lore);
                             loreFilterMatched = true;
                         }
                     }
@@ -118,7 +119,6 @@ public class DropItemEffect implements Effect {
             replacements.put("amount", String.valueOf(removalCount));
             replacements.put("item", MaterialType.GetName(item));
             plugin.config.sendMessage(ply, "effects.drop", replacements);
-
             plugin.debug(ply, "DropItemEffect: Dropping " + removalCount + " items from slot " + i + " (" + item.getType() + ")");
 
             if (inventoryCount - removalCount < 0) {

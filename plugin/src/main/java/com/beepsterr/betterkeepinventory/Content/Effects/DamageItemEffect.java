@@ -3,6 +3,7 @@ package com.beepsterr.betterkeepinventory.Content.Effects;
 import com.beepsterr.betterkeepinventory.BetterKeepInventory;
 import com.beepsterr.betterkeepinventory.Library.MetricContainer;
 import com.beepsterr.betterkeepinventory.Library.Utilities;
+import com.beepsterr.betterkeepinventory.api.LoggerInterface;
 import com.beepsterr.betterkeepinventory.api.Types.MaterialType;
 import com.beepsterr.betterkeepinventory.api.Types.SlotType;
 import com.beepsterr.betterkeepinventory.api.Effect;
@@ -54,12 +55,12 @@ public class DamageItemEffect implements Effect {
     }
 
     @Override
-    public void onRespawn(Player player, PlayerRespawnEvent event) {
+    public void onRespawn(Player player, PlayerRespawnEvent event, LoggerInterface logger) {
         // This effect doesn't do anything on respawn (yet)
     }
 
     @Override
-    public void onDeath(Player ply, PlayerDeathEvent event) {
+    public void onDeath(Player ply, PlayerDeathEvent event, LoggerInterface logger) {
         BetterKeepInventory plugin = BetterKeepInventory.getInstance();
         Random rng = plugin.rng;
 

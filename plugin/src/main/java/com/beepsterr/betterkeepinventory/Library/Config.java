@@ -65,9 +65,8 @@ public class Config {
             plugin.saveResource("messages.yml", false);
         }
         this.rawMessages = YamlConfiguration.loadConfiguration(new File(plugin.getDataFolder(), "messages.yml"));
-        nlb.log("Loading configuration from " + config.getCurrentPath());
 
-        version = config.getString("version", "2.0.0");
+        version = config.getString("version", "2.1.0");
         notifyChannel = VersionChannel.valueOf(config.getString("notify_channel", "STABLE").toUpperCase());
         hash = config.getString("hash", "OLD");
         debug = config.getBoolean("debug", false);
@@ -144,6 +143,8 @@ public class Config {
         String message = getMessage(key, replacements);
         if(!message.isEmpty()){
             ply.sendMessage(message);
+        }else{
+            ply.sendMessage(key);
         }
     }
 

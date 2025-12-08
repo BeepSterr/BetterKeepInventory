@@ -205,13 +205,13 @@ public final class BetterKeepInventory extends JavaPlugin implements Listener {
 
     public void debug(Player player, String message){
         if(config.isDebug()){
-//            log("[DEBUG] (" + player.getName() + ") " + message);
+            log("[DEBUG] (" + player.getName() + ") " + message);
         }
     }
 
     public void debug(String message){
         if(config.isDebug()){
-//            getLogger().log(Level.INFO, "[DEBUG] " + message);
+            getLogger().log(Level.INFO, "[DEBUG] " + message);
         }
     }
 

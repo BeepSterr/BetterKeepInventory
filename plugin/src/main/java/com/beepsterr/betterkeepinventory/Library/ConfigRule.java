@@ -33,7 +33,7 @@ public class ConfigRule {
         this.name = config.getString("name", "Unnamed Rule");
         this.enabled = config.getBoolean("enabled", false);
         this.nlb = nlb != null ? nlb : new NestedLogBuilder(Level.FINE);
-        this.nlb.child("Rule '" + name + "'");
+        this.nlb.child("Parsing Rule '" + name + "'");
 
         var api = Bukkit.getServer().getServicesManager().load(BetterKeepInventoryAPI.class);
         if(api == null){
@@ -132,30 +132,33 @@ public class ConfigRule {
 
 
     public void trigger(Player ply, PlayerDeathEvent deathEvent, PlayerRespawnEvent respawnEvent) {
+
+        this.nlb.child("Executing Rule '" + name + "'");
         BetterKeepInventory plugin = BetterKeepInventory.getInstance();
 
         if (!isEnabled()) {
-            plugin.debug(ply, "Rule " + this + " was skipped (not enabled)");
+            this.nlb.log("Skipped execution of rule '" + name + "' (enabled: false)");
             return;
         }
 
         // log all conditions that are to be checked
-        plugin.debug(ply, "Rule " + this + " checking conditions: " + conditions.stream().map(Condition::getClass));
 
-        if (conditions.isEmpty() || conditions.stream().allMatch(c -> c.check(ply, deathEvent, respawnEvent))) {
-            plugin.debug(ply, "Rule " + this + " met conditions, running effects!");
+        if (conditions.isEmpty() || conditions.stream().allMatch(c -> c.check(ply, deathEvent, respawnEvent, this.nlb))) {
+            this.nlb.log("All conditions met for rule '" + name + "'");
 
             if (deathEvent != null) {
                 for (Effect effect : effects) {
-                    plugin.debug(ply, "Running effect (D): " + effect.toString());
-                    effect.onDeath(ply, deathEvent);
+                    this.nlb.child("Effect: " + effect.getClass());
+                    effect.onDeath(ply, deathEvent, this.nlb);
+                    this.nlb.parent();
                 }
             }
 
             if (respawnEvent != null) {
                 for (Effect effect : effects) {
-                    plugin.debug(ply, "Running effect (R): " + effect.toString());
-                    effect.onRespawn(ply, respawnEvent);
+                    this.nlb.child("Effect: " + effect.getClass());
+                    effect.onRespawn(ply, respawnEvent, this.nlb);
+                    this.nlb.parent();
                 }
             }
 
@@ -164,7 +167,7 @@ public class ConfigRule {
             }
 
         } else {
-            plugin.debug(ply, "Rule " + this + " was skipped (conditions not met)");
+            this.nlb.log("Not all conditions were met, skipping effects.");
         }
 
         this.nlb.parent();
