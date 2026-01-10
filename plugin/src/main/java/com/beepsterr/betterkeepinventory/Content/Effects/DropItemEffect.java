@@ -2,7 +2,7 @@ package com.beepsterr.betterkeepinventory.Content.Effects;
 
 import com.beepsterr.betterkeepinventory.BetterKeepInventory;
 import com.beepsterr.betterkeepinventory.Library.Utilities;
-import com.beepsterr.betterkeepinventory.api.Types.MaterialType;
+import com.beepsterr.betterkeepinventory.api.Types.MaterialList;
 import com.beepsterr.betterkeepinventory.api.Effect;
 import com.beepsterr.betterkeepinventory.api.Types.SlotType;
 import org.bukkit.Material;
@@ -28,7 +28,7 @@ public class DropItemEffect implements Effect {
     private List<String> nameFilters = List.of();
     private List<String> loreFilters = List.of();
     private SlotType slots = new SlotType(List.of());
-    private MaterialType items = new MaterialType(List.of());
+    private MaterialList items = new MaterialList(List.of());
 
     public DropItemEffect(ConfigurationSection config) {
         this.mode = Mode.valueOf(config.getString("mode", "SIMPLE").toUpperCase());
@@ -38,7 +38,7 @@ public class DropItemEffect implements Effect {
         ConfigurationSection filters = config.getConfigurationSection("filters");
         if(filters != null) {
             this.slots = new SlotType(Utilities.ConfigList(filters, "slots"));
-            this.items = new MaterialType(Utilities.ConfigList(filters, "items"));
+            this.items = new MaterialList(Utilities.ConfigList(filters, "items"));
             this.nameFilters = Utilities.ConfigList(filters, "name");
             this.loreFilters = Utilities.ConfigList(filters, "lore");
         }
@@ -65,7 +65,7 @@ public class DropItemEffect implements Effect {
             var meta = item.getItemMeta();
 
             // Check the filters
-            if (!dropItems.isEmpty() && !this.items.isIncludeAll() && !dropItems.contains(item.getType())){
+            if (!dropItems.isEmpty() && !dropItems.contains(item.getType())){
                 plugin.debug(ply, "Drop skipped due to item filter: " + item.getType());
                 continue;
             };
@@ -116,7 +116,7 @@ public class DropItemEffect implements Effect {
 
             Map<String, String> replacements = new HashMap<>();
             replacements.put("amount", String.valueOf(removalCount));
-            replacements.put("item", MaterialType.GetName(item));
+            replacements.put("item", MaterialList.GetName(item));
             plugin.config.sendMessage(ply, "effects.drop", replacements);
 
             plugin.debug(ply, "DropItemEffect: Dropping " + removalCount + " items from slot " + i + " (" + item.getType() + ")");
