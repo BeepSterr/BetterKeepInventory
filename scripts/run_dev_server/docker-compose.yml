@@ -1,0 +1,24 @@
+services:
+  dev_server:
+    image: amazoncorretto:${JAVA_VERSION:-17}
+    ports:
+      - "25565:25565"
+    volumes:
+      - ./server:/usr/server
+      - ./worlds/${MINECRAFT_VERSION}/world:/usr/server/world
+      - ./worlds/${MINECRAFT_VERSION}/world_nether:/usr/server/world_nether
+      - ./worlds/${MINECRAFT_VERSION}/world_the_end:/usr/server/world_the_end
+      - ${SERVER_JAR}:/usr/server/server.jar
+    working_dir: /usr/server
+    tty: true
+    stdin_open: true
+    command:
+      - "java"
+      - "-DIReallyKnowWhatIAmDoingISwear"
+      - "-Xms4G"
+      - "-Xmx4G"
+      - "-XX:+UseG1GC"
+      - "-jar"
+      - "server.jar"
+      - "nogui"
+    restart: no

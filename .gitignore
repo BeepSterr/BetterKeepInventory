@@ -112,3 +112,5 @@ buildNumber.properties
 # Common working directory
 run/
 /_dev_server/
+/scripts/build_server_jar/jars/
+/scripts/run_dev_server/server/
