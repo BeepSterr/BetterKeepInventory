@@ -40,6 +40,13 @@ const config: Config = {
       'classic',
       {
         docs: {
+          lastVersion: '2.0.0',
+          versions: {
+            current: {
+              label: 'Snapshots',
+              banner: 'unreleased',
+            },
+          },
           sidebarPath: './sidebars.ts',
           routeBasePath: '/',
           editUrl:
@@ -62,7 +69,7 @@ const config: Config = {
     navbar: {
       title: 'BetterKeepInventory',
       logo: {
-        alt: 'My Site Logo',
+        alt: 'BetterKeepInventory Logo',
         src: 'img/93081.png',
       },
       items: [
@@ -71,6 +78,11 @@ const config: Config = {
           sidebarId: 'tutorialSidebar',
           position: 'left',
           label: 'Documentation',
+        },
+        {
+          type: 'docsVersionDropdown',
+          position: 'left',
+          dropdownActiveClassDisabled: true,
         },
         {
           href: 'https://github.com/beepsterr/betterkeepinventory',
@@ -85,7 +97,7 @@ const config: Config = {
       copyright: `Copyright © ${new Date().getFullYear()}.`,
     },
     prism: {
-      additionalLanguages: ['java'],
+      additionalLanguages: ['java', 'yaml'],
       theme: prismThemes.github,
       darkTheme: prismThemes.dracula,
     },
