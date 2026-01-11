@@ -3,7 +3,6 @@ package com.beepsterr.betterkeepinventory.api.Types;
 import com.beepsterr.betterkeepinventory.api.Exceptions.TypeError;
 import org.bukkit.Material;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
