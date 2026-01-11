@@ -113,9 +113,9 @@ public final class MaterialGroups {
     );
 
     public static final List<Material> RESOURCES = Collections.unmodifiableList(
-            Arrays.asList(StreamToArray(RESOURCE_COPPER), StreamToArray(RESOURCE_IRON),
-                            StreamToArray(RESOURCE_GOLD), StreamToArray(RESOURCE_DIAMOND),
-                            StreamToArray(RESOURCE_NETHERITE), StreamToArray(RESOURCE_MISC))
+            Arrays.asList(RESOURCE_COPPER, RESOURCE_IRON,
+                            RESOURCE_GOLD, RESOURCE_DIAMOND,
+                            RESOURCE_NETHERITE, RESOURCE_MISC)
                     .stream()
                     .flatMap(List::stream)
                     .toList()
@@ -216,8 +216,7 @@ public final class MaterialGroups {
             Material.SHEARS,
             Material.FLINT_AND_STEEL,
             Material.CARROT_ON_A_STICK,
-            Material.WARPED_FUNGUS_ON_A_STICK,
-            Material.SHEARS
+            Material.WARPED_FUNGUS_ON_A_STICK
     );
 
     public static final List<Material> TOOLS = Collections.unmodifiableList(
@@ -271,11 +270,6 @@ public final class MaterialGroups {
             throw new TypeError("Tried to parse invalid material group: " + token);
         }
         return group;
-    }
-
-    // stupid
-    private static List<Material> StreamToArray(List<Material> list) {
-        return list;
     }
 }
 

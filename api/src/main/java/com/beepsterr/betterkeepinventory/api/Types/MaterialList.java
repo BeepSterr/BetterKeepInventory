@@ -1,7 +1,6 @@
 package com.beepsterr.betterkeepinventory.api.Types;
 
 import com.beepsterr.betterkeepinventory.api.Exceptions.TypeError;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -26,10 +25,34 @@ public class MaterialList {
     }
 
     /**
-     * Parse a single material string and add it to the allowed materials if valid
-     * - * = all materials
-     * - ! = exclude material
-     * - G: = material group
+     * Parse a single material string and add or remove it from the allowed materials list.
+     * <p>
+     * Supported input formats:
+     * <ul>
+     *     <li>{@code *} — include all non-legacy materials. This clears the current list and
+     *     adds every non-legacy {@link Material}.</li>
+     *     <li>{@code !<material>} — exclude a specific material or material group from the
+     *     current list.</li>
+     *     <li>{@code G:<group>} — include (or, when prefixed with {@code !}, exclude) a named
+     *     material group as understood by {@link MaterialGroups#parse(String)}.</li>
+     *     <li>Plain material names such as {@code OAK_LOG}, matching the enum constants in
+     *     {@link Material} (case-insensitive).</li>
+     *     <li>Minecraft ID format such as {@code minecraft:oak_log}, as supported by
+     *     {@link Material#matchMaterial}.</li>
+     * </ul>
+     * <p>
+     * Behavior on invalid input:
+     * <ul>
+     *     <li>If {@code material} is {@code null} or blank after trimming, this method does
+     *     nothing.</li>
+     *     <li>If the string does not correspond to a valid {@link Material}, a recognized
+     *     Minecraft ID, or a valid group name, it is silently ignored; no exception is thrown
+     *     and {@link #allowedMaterials} is left unchanged.</li>
+     *     <li>If a material or group name is unknown or cannot be parsed, it is skipped and
+     *     the method returns without modifying the list.</li>
+     * </ul>
+     *
+     * @param material the material definition string to parse
      */
     public void parse(String material){
 
@@ -53,15 +76,6 @@ public class MaterialList {
             if (s.isEmpty()) return;
         }
 
-        try{
-            Material mat = Material.valueOf(material.toUpperCase());
-            if(!allowedMaterials.contains(mat)){
-                allowedMaterials.add(mat);
-            }
-        } catch (IllegalArgumentException e){
-            // bazinga nation - not a material, fall through to other parsing
-        }
-
         if(s.startsWith("G:")){
             try {
                 s = s.substring(2).trim();
@@ -80,7 +94,6 @@ public class MaterialList {
                 // invalid group - cry about it
             }
         }
-
 
         Material mat = Material.matchMaterial(s);
         if (mat == null) {
