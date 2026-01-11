@@ -15,6 +15,7 @@ import type {SidebarsConfig} from '@docusaurus/plugin-content-docs';
 const sidebars: SidebarsConfig = {
   tutorialSidebar: [
     'index',
+    'Installing',
     'Troubleshooting',
     'Configuration',
     {
@@ -39,6 +40,7 @@ const sidebars: SidebarsConfig = {
           },
       ],
     },
+    'API',
   ],
 };
 
