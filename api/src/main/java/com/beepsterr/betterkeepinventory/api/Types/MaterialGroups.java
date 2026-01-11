@@ -112,14 +112,11 @@ public final class MaterialGroups {
             Material.AMETHYST_BLOCK
     );
 
-    public static final List<Material> RESOURCES = Collections.unmodifiableList(
-            Arrays.asList(RESOURCE_COPPER, RESOURCE_IRON,
-                            RESOURCE_GOLD, RESOURCE_DIAMOND,
-                            RESOURCE_NETHERITE, RESOURCE_MISC)
-                    .stream()
-                    .flatMap(List::stream)
-                    .toList()
-    );
+    public static final List<Material> RESOURCES = Stream.of(RESOURCE_COPPER, RESOURCE_IRON,
+                    RESOURCE_GOLD, RESOURCE_DIAMOND,
+                    RESOURCE_NETHERITE, RESOURCE_MISC)
+            .flatMap(List::stream)
+            .toList();
 
     public static final List<Material> ARMOR = List.of(
             Material.LEATHER_HELMET,
@@ -219,17 +216,13 @@ public final class MaterialGroups {
             Material.WARPED_FUNGUS_ON_A_STICK
     );
 
-    public static final List<Material> TOOLS = Collections.unmodifiableList(
-            Stream.of(AXES, PICKAXES, SHOVELS, HOES, MISC_TOOLS)
-                    .flatMap(List::stream)
-                    .toList()
-    );
+    public static final List<Material> TOOLS = Stream.of(AXES, PICKAXES, SHOVELS, HOES, MISC_TOOLS)
+            .flatMap(List::stream)
+            .toList();
 
-    public static final List<Material> EQUIPMENT = Collections.unmodifiableList(
-            Stream.of(ARMOR, WEAPONS, TOOLS)
-                    .flatMap(List::stream)
-                    .toList()
-    );
+    public static final List<Material> EQUIPMENT = Stream.of(ARMOR, WEAPONS, TOOLS)
+            .flatMap(List::stream)
+            .toList();
 
     private static final Map<String, List<Material>> GROUP_MAP = createGroupMap();
 
