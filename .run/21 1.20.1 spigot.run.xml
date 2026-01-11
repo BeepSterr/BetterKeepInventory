@@ -1,9 +1,9 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="Build + Run Server" type="ShConfigurationType">
+  <configuration default="false" name="21 1.20.1 spigot" type="ShConfigurationType">
     <option name="SCRIPT_TEXT" value="cp .\target\BetterKeepInventory-*.jar .\dev_server\plugins\build.jar cd dev_server java -Xms4G -Xmx4G -XX:+UseG1GC -jar spigot.jar nogui" />
     <option name="INDEPENDENT_SCRIPT_PATH" value="true" />
-    <option name="SCRIPT_PATH" value="$PROJECT_DIR$/scripts/start.dev.sh" />
-    <option name="SCRIPT_OPTIONS" value="" />
+    <option name="SCRIPT_PATH" value="$PROJECT_DIR$/scripts/run_dev_server.sh" />
+    <option name="SCRIPT_OPTIONS" value="21 1.20.1 spigot" />
     <option name="INDEPENDENT_SCRIPT_WORKING_DIRECTORY" value="true" />
     <option name="SCRIPT_WORKING_DIRECTORY" value="$PROJECT_DIR$" />
     <option name="INDEPENDENT_INTERPRETER_PATH" value="true" />

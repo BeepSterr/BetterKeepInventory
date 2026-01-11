@@ -1,9 +1,8 @@
 package com.beepsterr.betterkeepinventory.Content.Effects;
 
 import com.beepsterr.betterkeepinventory.BetterKeepInventory;
-import com.beepsterr.betterkeepinventory.Library.MetricContainer;
 import com.beepsterr.betterkeepinventory.Library.Utilities;
-import com.beepsterr.betterkeepinventory.api.Types.MaterialType;
+import com.beepsterr.betterkeepinventory.api.Types.MaterialList;
 import com.beepsterr.betterkeepinventory.api.Types.SlotType;
 import com.beepsterr.betterkeepinventory.api.Effect;
 import org.bukkit.Material;
@@ -15,10 +14,8 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.Damageable;
-import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.*;
-import java.util.regex.Pattern;
 
 public class DamageItemEffect implements Effect {
 
@@ -34,7 +31,7 @@ public class DamageItemEffect implements Effect {
     private List<String> nameFilters = List.of();
     private List<String> loreFilters = List.of();
     private SlotType slots = new SlotType(List.of());
-    private MaterialType items = new MaterialType(List.of());
+    private MaterialList items = new MaterialList(List.of());
 
     public DamageItemEffect(ConfigurationSection config) {
         this.mode = Mode.valueOf(config.getString("mode", "PERCENTAGE").toUpperCase());
@@ -46,7 +43,7 @@ public class DamageItemEffect implements Effect {
         ConfigurationSection filters = config.getConfigurationSection("filters");
         if(filters != null) {
             this.slots = new SlotType(Utilities.ConfigList(filters, "slots"));
-            this.items = new MaterialType(Utilities.ConfigList(filters, "items"));
+            this.items = new MaterialList(Utilities.ConfigList(filters, "items"));
             this.nameFilters = Utilities.ConfigList(filters, "name");
             this.loreFilters = Utilities.ConfigList(filters, "lore");
         }
@@ -75,7 +72,7 @@ public class DamageItemEffect implements Effect {
             var meta = item.getItemMeta();
 
             // Check the filters
-            if (!items.isEmpty() && !this.items.isIncludeAll() && !items.contains(item.getType())){
+            if (!items.isEmpty() && !items.contains(item.getType())){
                 plugin.debug(ply, "Damage skipped due to item filter: " + item.getType());
                 continue;
             };
@@ -117,7 +114,7 @@ public class DamageItemEffect implements Effect {
             damageToTake = applyUnbreaking(item, damageToTake);
             Map<String, String> replacements = new HashMap<>();
             replacements.put("amount", String.valueOf(damageToTake));
-            replacements.put("item", MaterialType.GetName(item));
+            replacements.put("item", MaterialList.GetName(item));
 
             plugin.metrics.durabilityPointsLost += damageToTake;
 

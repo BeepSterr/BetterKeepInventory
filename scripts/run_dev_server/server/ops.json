@@ -3,6 +3,6 @@
     "uuid": "7cfc08a6-65c3-49fa-ae4d-8ebf80484dd8",
     "name": "BeepSterr",
     "level": 4,
-    "bypassesPlayerLimit": false
+    "bypassesPlayerLimit": true
   }
 ]
