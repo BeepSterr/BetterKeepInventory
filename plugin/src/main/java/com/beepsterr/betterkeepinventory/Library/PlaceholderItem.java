@@ -42,24 +42,30 @@ public class PlaceholderItem {
                 case "INCLUDES":
                     operator = PlaceholderConditionType.CONTAINS;
                     break;
-                case "*.":
+                case ".*":
                 case "BEGINS_WITH":
+                case "STARTS_WITH":
                     operator = PlaceholderConditionType.STARTS_WITH;
                     break;
-                case ".*":
+                case "*.":
                 case "STOPS_WITH":
+                case "ENDS_WITH":
                     operator = PlaceholderConditionType.ENDS_WITH;
                     break;
                 case ">":
+                case "GREATER_THAN":
                     operator = PlaceholderConditionType.GREATER_THAN;
                     break;
                 case ">=":
+                case "GREATER_THAN_OR_EQUALS":
                     operator = PlaceholderConditionType.GREATER_THAN_OR_EQUALS;
                     break;
                 case "<":
+                case "LESS_THAN":
                     operator = PlaceholderConditionType.LESS_THAN;
                     break;
                 case "<=":
+                case "LESS_THAN_OR_EQUALS":
                     operator = PlaceholderConditionType.LESS_THAN_OR_EQUALS;
                     break;
                 default:
