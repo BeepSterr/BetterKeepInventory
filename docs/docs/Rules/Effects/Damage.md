@@ -67,8 +67,10 @@ items:
   - "SHEARS"
   - "G:RESOURCES"
 ```
-A list of slots that are affected by this effect.
-Defaults to all slots.
+A List of items that are affected by this effects.
+Defaults to all items.
+
+Supports [Resource Lists](../../ResourceLists) for item groups.
 
 ### Slots
 ```yaml

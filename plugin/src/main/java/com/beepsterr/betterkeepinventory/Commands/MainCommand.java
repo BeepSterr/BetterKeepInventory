@@ -107,7 +107,7 @@ public class MainCommand implements CommandExecutor, TabCompleter {
             }
 
             SendLink(sender, "SpigotMC", "https://www.spigotmc.org/resources/betterkeepinventory.93081/");
-            SendLink(sender, "Documentation", "https://beeps.notion.site/Better-Keep-Inventory-f5d49a15a8174ce598bbb876d3003e46");
+            SendLink(sender, "Documentation", "https://bki.beepsterr.com");
             SendLink(sender, "Discord", "https://leafcat.live/discord");
 
             sender.sendMessage("");

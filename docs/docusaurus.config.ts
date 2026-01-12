@@ -50,7 +50,7 @@ const config: Config = {
           sidebarPath: './sidebars.ts',
           routeBasePath: '/',
           editUrl:
-            'https://github.com/BeepSterr/BetterKeepInventory/edit/main/docs/',
+            'https://github.com/BeepSterr/BetterKeepInventory/edit/master/docs/',
         },
         blog: false,
         theme: {

@@ -3,6 +3,7 @@ Wherever a list of items is accepted, you can use the following resource groups 
 
 | Value           | Includes Materials                                                                                             |
 |-----------------|----------------------------------------------------------------------------------------------------------------|
+| minecraft:id     | A Namespaced Minecraft ID (minecraft:oak_log)                                                                  |
 | `Material`      | A specific [Spigot Material](https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Material.html)                |
 | G:RESOURCES     | G:COPPER, G:IRON, G:GOLD, G:DIAMOND, G:NETHERITE, G:RESOURCE_MISC                                              |
 | G:NETHERITE     | NETHERITE_SCRAP, NETHERITE_INGOT, NETHERITE_BLOCK, ANCIENT_DEBRIS                                              |
