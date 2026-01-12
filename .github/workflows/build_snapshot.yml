@@ -100,7 +100,7 @@ jobs:
           project: "j0QDn41h"
           version: "${{ steps.versioning.outputs.version }}"
           loaders: '["spigot", "paper", "purpur", "folia"]'
-          game-versions: '["1.21.x", "1.20.x", "1.19.x", "1.18.x", "1.17.x"]'
+          game-versions: '["1.21.x", "1.20.x", "1.19.x"]'
           files: ./out/BetterKeepInventory-${{ steps.versioning.outputs.version }}.jar
           channel: "alpha"
           changelog: "Snapshot build ${{ steps.versioning.outputs.version }}. Snapshots are automatically generated and may contain untested changes, please use them with caution."
