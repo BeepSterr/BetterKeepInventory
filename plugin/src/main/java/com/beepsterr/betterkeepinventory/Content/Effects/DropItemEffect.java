@@ -52,11 +52,21 @@ public class DropItemEffect implements Effect {
 
     @Override
     public void onDeath(Player ply, PlayerDeathEvent event, LoggerInterface logger) {
+        logger.child("Effect: Drop Items");
         BetterKeepInventory plugin = BetterKeepInventory.getInstance();
         Random rng = plugin.rng;
 
         List<Integer> dropSlots = this.slots.getSlotIds();
         List<Material> dropItems = items.getMaterials();
+
+        logger.log("Mode: " + mode + ", Min: " + min + ", Max: " + max);
+        logger.log("Filters - Slots: " + (!dropSlots.isEmpty() ? dropSlots.size() : "none") +
+                  ", Items: " + (!dropItems.isEmpty() ? dropItems.size() : "none") +
+                  ", Name: " + (!nameFilters.isEmpty() ? nameFilters.size() : "none") +
+                  ", Lore: " + (!loreFilters.isEmpty() ? loreFilters.size() : "none"));
+
+        int itemsProcessed = 0;
+        int totalDropped = 0;
 
         for (int i = 0; i < ply.getInventory().getSize(); i++) {
 
@@ -67,38 +77,41 @@ public class DropItemEffect implements Effect {
 
             // Check the filters
             if (!dropItems.isEmpty() && !this.items.isIncludeAll() && !dropItems.contains(item.getType())){
-                logger.log("Drop skipped due to item filter: " + item.getType());
+                logger.log("Skip slot " + i + ": item filter (" + item.getType() + ")");
                 continue;
             };
             if (!dropSlots.isEmpty() && !dropSlots.contains(i)){
-                logger.log("Drop skipped due to slot filter: " + item.getType() + " at slot " + i);
+                logger.log("Skip slot " + i + ": slot filter");
                 continue;
             };
 
             if(meta != null){
                 if (!nameFilters.isEmpty() && !Utilities.advancedStringCompare(meta.getDisplayName(), nameFilters)){
-                    logger.log("Drop skipped due to name filter: " + item.getType() + " with name " + meta.getDisplayName());
+                    logger.log("Skip slot " + i + ": name filter (" + meta.getDisplayName() + ")");
                     continue;
                 };
                 if(meta.getLore() != null){
                     boolean loreFilterMatched = false;
                     for( String lore : meta.getLore()){
                         if (!loreFilters.isEmpty() && !Utilities.advancedStringCompare(lore, loreFilters)) {
-                            logger.log("Drop skipped due to lore filter: " + item.getType() + " with lore " + lore);
                             loreFilterMatched = true;
                         }
                     }
                     if(loreFilterMatched){
+                        logger.log("Skip slot " + i + ": lore filter");
                         continue;
                     }
                 }
             }
 
+            itemsProcessed++;
 
             // Drop all
             if (mode == Mode.ALL) {
+                logger.log("Slot " + i + " (" + item.getType() + "): dropping ALL (" + item.getAmount() + ")");
                 ply.getWorld().dropItemNaturally(ply.getLocation(), item);
                 ply.getInventory().setItem(i, null);
+                totalDropped += item.getAmount();
                 continue;
             }
 
@@ -113,13 +126,10 @@ public class DropItemEffect implements Effect {
                 }
             }
 
-            if (removalCount <= 0) continue;
-
-            Map<String, String> replacements = new HashMap<>();
-            replacements.put("amount", String.valueOf(removalCount));
-            replacements.put("item", MaterialType.GetName(item));
-            plugin.config.sendMessage(ply, "effects.drop", replacements);
-            plugin.debug(ply, "DropItemEffect: Dropping " + removalCount + " items from slot " + i + " (" + item.getType() + ")");
+            if (removalCount <= 0) {
+                logger.log("Slot " + i + " (" + item.getType() + "): calculated drop=" + removalCount + ", skipping");
+                continue;
+            }
 
             if (inventoryCount - removalCount < 0) {
                 removalCount = inventoryCount;
@@ -127,9 +137,17 @@ public class DropItemEffect implements Effect {
 
             if (removalCount == 0) continue;
 
+            logger.log("Slot " + i + " (" + item.getType() + "): dropping " + removalCount + "/" + inventoryCount);
+
+            Map<String, String> replacements = new HashMap<>();
+            replacements.put("amount", String.valueOf(removalCount));
+            replacements.put("item", MaterialType.GetName(item));
+            plugin.config.sendMessage(ply, "effects.drop", replacements);
+
             var itemClone = item.clone();
             itemClone.setAmount(removalCount);
             ply.getWorld().dropItemNaturally(ply.getLocation(), itemClone);
+            totalDropped += removalCount;
 
             if (inventoryCount - removalCount == 0) {
                 ply.getInventory().setItem(i, null);
@@ -138,5 +156,8 @@ public class DropItemEffect implements Effect {
                 ply.getInventory().setItem(i, item);
             }
         }
+
+        logger.log("Summary: " + itemsProcessed + " stacks processed, " + totalDropped + " items dropped");
+        logger.parent();
     }
 }

@@ -61,13 +61,24 @@ public class DamageItemEffect implements Effect {
 
     @Override
     public void onDeath(Player ply, PlayerDeathEvent event, LoggerInterface logger) {
+        logger.child("Effect: Damage Items");
         BetterKeepInventory plugin = BetterKeepInventory.getInstance();
         Random rng = plugin.rng;
 
         List<Integer> slots = this.slots.getSlotIds();
         List<Material> items = this.items.getMaterials();
 
-        BetterKeepInventory.instance.debug(ply, "The Items Are " + items);
+        logger.log("Mode: " + mode + ", Min: " + min + ", Max: " + max);
+        logger.log("Use enchantments: " + useEnchantments + ", Don't break: " + dontBreak);
+        logger.log("Filters - Slots: " + (!slots.isEmpty() ? slots.size() : "none") +
+                  ", Items: " + (!items.isEmpty() ? items.size() : "none") +
+                  ", Name: " + (!nameFilters.isEmpty() ? nameFilters.size() : "none") +
+                  ", Lore: " + (!loreFilters.isEmpty() ? loreFilters.size() : "none"));
+
+        int itemsProcessed = 0;
+        int itemsDamaged = 0;
+        int itemsBroken = 0;
+
         for (int i = 0; i < ply.getInventory().getSize(); i++) {
 
             var item = ply.getInventory().getItem(i);
@@ -77,17 +88,17 @@ public class DamageItemEffect implements Effect {
 
             // Check the filters
             if (!items.isEmpty() && !this.items.isIncludeAll() && !items.contains(item.getType())){
-                plugin.debug(ply, "Damage skipped due to item filter: " + item.getType());
+                logger.log("Skip slot " + i + ": item filter (" + item.getType() + ")");
                 continue;
             };
             if (!slots.isEmpty() && !slots.contains(i)){
-                plugin.debug(ply, "Damage skipped due to slot filter: " + item.getType() + " at slot " + i);
+                logger.log("Skip slot " + i + ": slot filter");
                 continue;
             };
 
             if(meta != null){
                 if (!nameFilters.isEmpty() && !Utilities.advancedStringCompare(meta.getDisplayName(), nameFilters)){
-                    plugin.debug(ply, "Damage skipped due to name filter: " + item.getType() + " with name " + meta.getDisplayName());
+                    logger.log("Skip slot " + i + ": name filter (" + meta.getDisplayName() + ")");
                     continue;
                 };
                 if(meta.getLore() != null){
@@ -98,16 +109,18 @@ public class DamageItemEffect implements Effect {
                         }
                     }
                     if(loreFilterMatched){
-                        plugin.debug(ply, "Damage skipped due to lore filter: " + item.getType());
+                        logger.log("Skip slot " + i + ": lore filter");
                         continue;
                     }
                 }
             }
 
             if (!(meta instanceof Damageable damageableMeta)){
-                plugin.debug(ply, "Damage skipped due to item not being damageable: " + item.getType());
+                logger.log("Skip slot " + i + ": not damageable (" + item.getType() + ")");
                 continue;
             };
+
+            itemsProcessed++;
 
             int currentDamageTaken = damageableMeta.getDamage();
             int maxDurability = item.getType().getMaxDurability();
@@ -115,7 +128,12 @@ public class DamageItemEffect implements Effect {
 
             if (damageToTake < 0) continue;
 
+            int originalDamage = damageToTake;
             damageToTake = applyUnbreaking(item, damageToTake);
+
+            logger.log("Slot " + i + " (" + item.getType() + "): durability=" + currentDamageTaken + "/" + maxDurability +
+                      ", damage=" + damageToTake + (originalDamage != damageToTake ? " (reduced from " + originalDamage + " by unbreaking)" : ""));
+
             Map<String, String> replacements = new HashMap<>();
             replacements.put("amount", String.valueOf(damageToTake));
             replacements.put("item", MaterialType.GetName(item));
@@ -126,22 +144,27 @@ public class DamageItemEffect implements Effect {
                 if (dontBreak || item.getType() == Material.ELYTRA) { // elytra is special, it doesn't break
                     damageableMeta.setDamage(maxDurability);
                     item.setItemMeta(damageableMeta);
-                    plugin.debug(ply, "Item saved from breaking: " + item.getType());
+                    logger.log("  → Saved from breaking (dont_break=" + dontBreak + ", elytra=" + (item.getType() == Material.ELYTRA) + ")");
                     plugin.config.sendMessage(ply, "effects.damage", replacements);
                 } else {
                     item.setAmount(item.getAmount() - 1);
                     damageableMeta.setDamage(0);
                     item.setItemMeta(meta);
                     ply.getWorld().playSound(ply.getLocation(), Sound.ENTITY_ITEM_BREAK, 0.8f, 0.8f);
-                    plugin.debug(ply, "Item broke: " + item.getType());
+                    logger.log("  → Item BROKE");
+                    itemsBroken++;
                     plugin.config.sendMessage(ply, "effects.damage_break", replacements);
                 }
             } else {
                 damageableMeta.setDamage(currentDamageTaken + damageToTake);
                 item.setItemMeta(meta);
+                itemsDamaged++;
                 plugin.config.sendMessage(ply, "effects.damage", replacements);
             }
         }
+
+        logger.log("Summary: " + itemsProcessed + " items processed, " + itemsDamaged + " damaged, " + itemsBroken + " broken");
+        logger.parent();
     }
 
     private int calculateDamage(Random rng, int currentDamageTaken, int maxDurability) {

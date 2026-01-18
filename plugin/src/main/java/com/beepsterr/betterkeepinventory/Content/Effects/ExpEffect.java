@@ -42,22 +42,28 @@ public class ExpEffect implements Effect {
 
     @Override
     public void onDeath(Player ply, PlayerDeathEvent event, LoggerInterface logger) {
+        logger.child("Effect: Experience Loss");
         BetterKeepInventory plugin = BetterKeepInventory.getInstance();
         Random rng = plugin.rng;
 
         int playerExpLevel = ply.getLevel();
+        logger.log("Player current level: " + playerExpLevel);
+        logger.log("Mode: " + mode + ", How: " + how + ", Min: " + min + ", Max: " + max);
+
         int levelsToLose = switch (mode) {
             case SIMPLE -> (int) (min + (max - min) * rng.nextDouble());
             case PERCENTAGE -> (int) (playerExpLevel * ((min + (max - min) * rng.nextDouble()) / 100.0));
             case ALL -> playerExpLevel;
         };
 
-        plugin.debug(ply, "is losing " + levelsToLose + " levels of experience.");
+        logger.log("Calculated levels to lose: " + levelsToLose);
 
         Map<String, String> replacements = new HashMap<>();
         replacements.put("amount", String.valueOf(Math.min(levelsToLose, playerExpLevel)));
 
         if(levelsToLose < 1){
+            logger.log("No levels to lose, skipping");
+            logger.parent();
             return;
         }
 
@@ -65,6 +71,7 @@ public class ExpEffect implements Effect {
             case DELETE -> {
                 ply.setLevel(playerExpLevel - levelsToLose);
                 ply.setExp(0);
+                logger.log("Deleted " + levelsToLose + " levels (new level: " + ply.getLevel() + ")");
                 plugin.config.sendMessage(ply, "effects.exp_loss", replacements);
             }
             case DROP -> {
@@ -79,13 +86,14 @@ public class ExpEffect implements Effect {
                     ply.setExp(0);
                 }
 
-                plugin.debug(ply, "dropping " + expToDrop + " experience points.");
+                logger.log("Dropping " + (int)Math.round(expToDrop) + " experience points (new level: " + ply.getLevel() + ")");
 
                 ExperienceOrb orb = ply.getWorld().spawn(ply.getLocation(), ExperienceOrb.class);
                 orb.setExperience((int) Math.round(expToDrop));
                 plugin.config.sendMessage(ply, "effects.exp_dropped", replacements);
             }
         }
+        logger.parent();
     }
 
     private int getExpAtLevel(int level) {

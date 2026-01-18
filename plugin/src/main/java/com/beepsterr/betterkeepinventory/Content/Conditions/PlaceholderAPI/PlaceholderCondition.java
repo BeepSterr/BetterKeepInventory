@@ -31,14 +31,21 @@ public class PlaceholderCondition implements Condition {
 
     @Override
     public boolean check(Player ply, PlayerDeathEvent deathEvent, PlayerRespawnEvent respawnEvent, LoggerInterface logger) {
-        BetterKeepInventory.instance.debug(ply, "Going to test " + this.placeholderConditions.size() + " placeholder conditions");
+        logger.child("Condition: PlaceholderAPI");
+        logger.log("Testing " + this.placeholderConditions.size() + " placeholder condition(s)");
 
         for (PlaceholderItem item : this.placeholderConditions) {
-            BetterKeepInventory.instance.debug(ply, item.toString() + " Result: " + item.test(ply));
-            if (item.test(ply)) {
+            boolean testResult = item.test(ply);
+            logger.log("Placeholder: " + item.toString() + " = " + (testResult ? "MATCHED" : "NOT MATCHED"));
+            if (testResult) {
+                logger.log("Result: MATCHED");
+                logger.parent();
                 return true;
             }
         }
+
+        logger.log("Result: NOT MATCHED (no placeholders matched)");
+        logger.parent();
         return false;
     }
 }

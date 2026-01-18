@@ -21,6 +21,14 @@ public class WorldsCondition implements Condition {
 
     @Override
     public boolean check(Player ply, PlayerDeathEvent deathEvent, PlayerRespawnEvent respawnEvent, LoggerInterface logger) {
-        return Utilities.advancedStringCompare(ply.getWorld().getName(), worlds);
+        logger.child("Condition: Worlds");
+        String worldName = ply.getWorld().getName();
+        logger.log("Current world: " + worldName);
+        logger.log("Checking against " + worlds.size() + " world pattern(s): " + worlds);
+
+        boolean result = Utilities.advancedStringCompare(worldName, worlds);
+        logger.log("Result: " + (result ? "MATCHED" : "NOT MATCHED"));
+        logger.parent();
+        return result;
     }
 }

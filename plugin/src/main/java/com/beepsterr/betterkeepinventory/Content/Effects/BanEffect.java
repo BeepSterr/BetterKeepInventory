@@ -49,6 +49,10 @@ public class BanEffect implements Effect {
 
     @Override
     public void onDeath(Player ply, PlayerDeathEvent event, LoggerInterface logger) {
+        logger.child("Effect: Ban");
+        logger.log("Ban message: " + message);
+        logger.log("Ban duration: " + (expiration != null ? expiration.toString() : "PERMANENT"));
+        logger.log("Scheduling ban after 1 tick to prevent duplication issues");
 
         // Delaying the ban and kick by 1 tick to prevent item dupe issue if used with drop effect.
         BetterKeepInventory.getScheduler().getScheduler().runAtEntityLater( ply, () -> {
@@ -56,13 +60,18 @@ public class BanEffect implements Effect {
             Date expires = null;
             if (this.expiration != null) {
                 expires = Date.from(Instant.now().plus(this.expiration));
+                logger.log("Ban will expire at: " + expires);
+            } else {
+                logger.log("Ban is permanent");
             }
 
             Bukkit.getBanList(BanList.Type.NAME).addBan(ply.getName(), this.message, expires, String.valueOf(ply.getUniqueId()));
+            logger.log("Banned and kicking player: " + ply.getName());
             ply.kickPlayer(this.message);
 
         }, 1L);
 
+        logger.parent();
     }
 
     @Override

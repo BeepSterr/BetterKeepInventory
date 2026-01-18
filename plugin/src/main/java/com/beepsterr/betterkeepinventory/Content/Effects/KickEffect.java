@@ -23,12 +23,17 @@ public class KickEffect implements Effect {
 
     @Override
     public void onDeath(Player ply, PlayerDeathEvent event, LoggerInterface logger) {
+        logger.child("Effect: Kick");
+        logger.log("Kick message: " + message);
+        logger.log("Scheduling kick after 1 tick to prevent duplication issues");
 
         // Delaying the kick by 1 tick to prevent item dupe issue if used with drop effect.
         BetterKeepInventory.getScheduler().getScheduler().runAtEntityLater( ply, () -> {
+            logger.log("Kicking player: " + ply.getName());
             ply.kickPlayer(message);
         }, 1L);
 
+        logger.parent();
     }
 
     @Override

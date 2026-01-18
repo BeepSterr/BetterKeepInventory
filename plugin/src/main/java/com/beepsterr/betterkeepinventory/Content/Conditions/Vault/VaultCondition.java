@@ -19,8 +19,16 @@ public class VaultCondition implements Condition {
 
     @Override
     public boolean check(Player ply, PlayerDeathEvent deathEvent, PlayerRespawnEvent respawnEvent, LoggerInterface logger) {
-        BetterKeepInventory.getInstance().debug(ply, "Checking economy condition: Minimum balance required = " + minBalance);
+        logger.child("Condition: Vault Economy");
         Vault vault = new Vault(BetterKeepInventory.getInstance());
-        return vault.getPlayerBalance(ply) >= minBalance;
+        double playerBalance = vault.getPlayerBalance(ply);
+
+        logger.log("Minimum balance required: " + vault.format(minBalance));
+        logger.log("Player current balance: " + vault.format(playerBalance));
+
+        boolean result = playerBalance >= minBalance;
+        logger.log("Result: " + (result ? "MATCHED" : "NOT MATCHED") + " (player " + (result ? "has enough" : "lacks") + " funds)");
+        logger.parent();
+        return result;
     }
 }

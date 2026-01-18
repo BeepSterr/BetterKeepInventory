@@ -26,20 +26,33 @@ public class HungerEffect implements Effect {
 
     @Override
     public void onDeath(Player ply, PlayerDeathEvent event, LoggerInterface logger) {
+        logger.child("Effect: Hunger");
         int currentHunger = ply.getFoodLevel();
         int newHunger = Math.max(currentHunger - amount, min);
+
+        logger.log("Current hunger: " + currentHunger + ", Amount to remove: " + amount + ", Min: " + min);
+        logger.log("New hunger after death: " + newHunger);
+        logger.log("Saving for respawn");
+
         hungerMap.put(ply.getUniqueId(), newHunger);
-        BetterKeepInventory.getInstance().debug(ply, "saving hunger level " + newHunger + " for respawn.");
+        logger.parent();
     }
 
     @Override
     public void onRespawn(Player ply, PlayerRespawnEvent event, LoggerInterface logger) {
+        logger.child("Effect: Hunger (Respawn)");
+        logger.log("Scheduling hunger restoration after 5 ticks");
+
         Bukkit.getScheduler().runTaskLater(BetterKeepInventory.getInstance(), () -> {
             Integer saved = hungerMap.remove(ply.getUniqueId());
             if (saved != null) {
                 ply.setFoodLevel(saved);
-                BetterKeepInventory.getInstance().debug(ply, "set hunger level to " + saved + " after respawn.");
+                logger.log("Restored hunger to " + saved);
+            } else {
+                logger.log("No saved hunger found for player");
             }
         }, 5L);
+
+        logger.parent();
     }
 }

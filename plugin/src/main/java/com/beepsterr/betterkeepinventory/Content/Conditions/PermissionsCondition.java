@@ -19,14 +19,25 @@ public class PermissionsCondition implements Condition {
 
     @Override
     public boolean check(Player ply, PlayerDeathEvent deathEvent, PlayerRespawnEvent respawnEvent, LoggerInterface logger) {
+        logger.child("Condition: Permissions");
+        logger.log("Checking " + permissions.size() + " permission node(s)");
+
         for (String perm : permissions) {
             boolean negated = perm.startsWith("!");
             String actual = negated ? perm.substring(1) : perm;
+            boolean hasPermission = ply.hasPermission(actual);
 
-            if (negated != ply.hasPermission(actual)) {
+            logger.log("Node: " + perm + " (negated=" + negated + ", has=" + hasPermission + ")");
+
+            if (negated != hasPermission) {
+                logger.log("Result: MATCHED");
+                logger.parent();
                 return true;
             }
         }
+
+        logger.log("Result: NOT MATCHED (no permissions matched)");
+        logger.parent();
         return false;
     }
 }

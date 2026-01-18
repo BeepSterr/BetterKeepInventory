@@ -38,24 +38,32 @@ public class VaultEffect implements Effect {
 
     @Override
     public void onDeath(Player ply, PlayerDeathEvent event, LoggerInterface logger) {
+        logger.child("Effect: Vault Economy");
         Vault vault = new Vault(BetterKeepInventory.getInstance());
         BetterKeepInventory plugin = BetterKeepInventory.getInstance();
         Random rng = plugin.rng;
 
         double playerBalance = vault.getPlayerBalance(ply);
+        logger.log("Player balance: " + vault.format(playerBalance));
+        logger.log("Mode: " + mode + ", Min: " + min + ", Max: " + max);
+        logger.log("Allow negative balance: " + allowNegativeBalance);
+
         double balanceLoss = calculateLoss(playerBalance, rng);
+        logger.log("Calculated loss: " + vault.format(balanceLoss));
 
         if (playerBalance < balanceLoss && !allowNegativeBalance) {
             balanceLoss = playerBalance;
+            logger.log("Adjusted loss to prevent negative balance: " + vault.format(balanceLoss));
         }
 
         vault.takeMoney(ply, balanceLoss);
+        logger.log("Took " + vault.format(balanceLoss) + " from player (new balance: " + vault.format(vault.getPlayerBalance(ply)) + ")");
 
         Map<String, String> replacements = new HashMap<>();
         replacements.put("amount", vault.format(balanceLoss));
         plugin.config.sendMessage(ply, "effects.economy", replacements);
 
-        plugin.debug(ply, "EconomyLoss: Took " + balanceLoss + " from player " + ply.getName());
+        logger.parent();
     }
 
     private double calculateLoss(double balance, Random rng) {
