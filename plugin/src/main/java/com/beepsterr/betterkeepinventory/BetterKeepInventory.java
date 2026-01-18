@@ -13,7 +13,9 @@ import com.beepsterr.betterkeepinventory.Events.OnPlayerJoin;
 import com.beepsterr.betterkeepinventory.Events.OnPlayerRespawn;
 import com.beepsterr.betterkeepinventory.Exceptions.UnloadableConfiguration;
 import com.beepsterr.betterkeepinventory.Library.Config;
+import com.beepsterr.betterkeepinventory.Library.Debugger;
 import com.beepsterr.betterkeepinventory.Library.MetricContainer;
+import com.beepsterr.betterkeepinventory.Library.NestedLogBuilder;
 import com.beepsterr.betterkeepinventory.Library.Versions.Version;
 import com.beepsterr.betterkeepinventory.Library.Versions.VersionChannel;
 import com.beepsterr.betterkeepinventory.Library.Versions.VersionChecker;
@@ -22,7 +24,6 @@ import com.beepsterr.betterkeepinventory.Registries.PluginEffectRegistry;
 import com.beepsterr.betterkeepinventory.api.BetterKeepInventoryAPI;
 import com.beepsterr.betterkeepinventory.api.BetterKeepInventoryAPIImpl;
 import com.tcoded.folialib.FoliaLib;
-import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -45,6 +46,7 @@ public final class BetterKeepInventory extends JavaPlugin implements Listener {
 
     public Random rng = new Random();
     public MetricContainer metrics;
+    public Debugger debugger = new Debugger();
 
     // Plugin Registries
     private final PluginConditionRegistry conditionRegistry = new PluginConditionRegistry();
@@ -57,15 +59,20 @@ public final class BetterKeepInventory extends JavaPlugin implements Listener {
         instance = this;
         foliaLib = new FoliaLib(BetterKeepInventory.getInstance());
 
+        NestedLogBuilder nlb = new NestedLogBuilder();
+        nlb.log("BetterKeepInventory is starting up...");
+        nlb.cont("v" + version.toString());
+        nlb.spacer();
+
         // Initialize API
         BetterKeepInventoryAPI api = new BetterKeepInventoryAPIImpl(conditionRegistry, effectRegistry);
         getServer().getServicesManager().register(BetterKeepInventoryAPI.class, api, this, ServicePriority.Highest);
 
-        this.registerConditions(api);
-        this.registerEffects(api);
+        this.registerConditions(api, nlb);
+        this.registerEffects(api, nlb);
 
         try {
-            config = new Config(getConfig());
+            config = new Config(getConfig(), nlb);
         }catch (UnloadableConfiguration e){
             CrashAndDisable("Configuration failed to load!\n" + e.getMessage());
             return;
@@ -86,13 +93,16 @@ public final class BetterKeepInventory extends JavaPlugin implements Listener {
 
         // Enable PAPI Integration
         if(checkDependency("PlaceholderAPI")){
-            log("Hello PlaceholderAPI!");
+            nlb.log("Hello PlaceholderAPI! Registering expansion...");
             new BetterKeepInventoryPlaceholderExpansion().register();
         }
 
         if(config.getNotifyChannel() != VersionChannel.NONE){
+            nlb.log("Setting up Version Checker...");
             versionChecker = new VersionChecker(config.getNotifyChannel());
         }
+
+        nlb.end();
 
     }
 
@@ -107,34 +117,53 @@ public final class BetterKeepInventory extends JavaPlugin implements Listener {
         }
     }
 
-    private void registerEffects(BetterKeepInventoryAPI api) {
+    private void registerEffects(BetterKeepInventoryAPI api, NestedLogBuilder nlb) {
+
+        nlb.child("Registry: Effects");
 
         // register built-in effects
+        nlb.log("damage");
         api.effectRegistry().register(this, "damage", DamageItemEffect::new);
+        nlb.log("drop");
         api.effectRegistry().register(this, "drop", DropItemEffect::new);
+        nlb.log("exp");
         api.effectRegistry().register(this, "exp", ExpEffect::new);
+        nlb.log("hunger");
         api.effectRegistry().register(this, "hunger", HungerEffect::new);
+        nlb.log("kick");
         api.effectRegistry().register(this, "kick", KickEffect::new);
+        nlb.log("ban");
         api.effectRegistry().register(this, "ban", BanEffect::new);
 
         if(checkDependency("Vault")){
+            nlb.log("vault");
             api.effectRegistry().register(this, "vault", VaultEffect::new);
         }
 
+        nlb.parent();
+
     }
 
-    private void registerConditions(BetterKeepInventoryAPI api) {
+    private void registerConditions(BetterKeepInventoryAPI api, NestedLogBuilder nlb) {
+
+        nlb.child("Registry: Conditions");
 
         // register built-in conditions
+        nlb.log("worlds");
         api.conditionRegistry().register(this, "worlds", WorldsCondition::new);
+        nlb.log("permissions");
         api.conditionRegistry().register(this, "permissions", PermissionsCondition::new);
 
         if(checkDependency("Vault")){
+            nlb.log("vault");
             api.conditionRegistry().register(this, "vault", VaultCondition::new);
         }
         if(checkDependency("PlaceholderAPI")){
+            nlb.log("placeholders");
             api.conditionRegistry().register(this, "placeholders", PlaceholderCondition::new);
         }
+
+        nlb.parent();
 
     }
 

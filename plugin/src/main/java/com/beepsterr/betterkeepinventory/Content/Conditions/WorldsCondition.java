@@ -2,6 +2,7 @@ package com.beepsterr.betterkeepinventory.Content.Conditions;
 
 import com.beepsterr.betterkeepinventory.Library.Utilities;
 import com.beepsterr.betterkeepinventory.api.Condition;
+import com.beepsterr.betterkeepinventory.api.LoggerInterface;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.PlayerDeathEvent;
@@ -19,7 +20,7 @@ public class WorldsCondition implements Condition {
     }
 
     @Override
-    public boolean check(Player ply, PlayerDeathEvent deathEvent, PlayerRespawnEvent respawnEvent) {
+    public boolean check(Player ply, PlayerDeathEvent deathEvent, PlayerRespawnEvent respawnEvent, LoggerInterface logger) {
         return Utilities.advancedStringCompare(ply.getWorld().getName(), worlds);
     }
 }

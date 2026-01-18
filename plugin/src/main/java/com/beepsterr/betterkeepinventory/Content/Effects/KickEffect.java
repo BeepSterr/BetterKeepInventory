@@ -2,6 +2,7 @@ package com.beepsterr.betterkeepinventory.Content.Effects;
 
 import com.beepsterr.betterkeepinventory.BetterKeepInventory;
 import com.beepsterr.betterkeepinventory.api.Effect;
+import com.beepsterr.betterkeepinventory.api.LoggerInterface;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
@@ -21,7 +22,7 @@ public class KickEffect implements Effect {
     }
 
     @Override
-    public void onDeath(Player ply, PlayerDeathEvent event) {
+    public void onDeath(Player ply, PlayerDeathEvent event, LoggerInterface logger) {
 
         // Delaying the kick by 1 tick to prevent item dupe issue if used with drop effect.
         BetterKeepInventory.getScheduler().getScheduler().runAtEntityLater( ply, () -> {
@@ -31,7 +32,7 @@ public class KickEffect implements Effect {
     }
 
     @Override
-    public void onRespawn(Player ply, PlayerRespawnEvent event) {
+    public void onRespawn(Player ply, PlayerRespawnEvent event, LoggerInterface logger) {
         // No action needed on respawn for this effect
     }
 }

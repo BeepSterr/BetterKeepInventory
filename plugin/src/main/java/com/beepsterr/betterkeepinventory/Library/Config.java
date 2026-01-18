@@ -36,27 +36,37 @@ public class Config {
     private final boolean debug;
     private final DefaultBehavior defaultBehavior;
 
-    public Config(FileConfiguration config) throws UnloadableConfiguration {
+    public Config(FileConfiguration config, NestedLogBuilder nlb) throws UnloadableConfiguration {
 
         BetterKeepInventory plugin = BetterKeepInventory.getInstance();
+
+        if(nlb == null){
+            nlb = new NestedLogBuilder();
+        }
+        nlb.child("Loading Plugin Configuration");
 
         instance = this;
         this.rawConfig = config;
 
+        nlb.log("Loading config.yml from " + plugin.getDataFolder());
+
 
         if(Objects.equals(this.rawConfig.getString("version", "default"), "default")) {
-            plugin.log("Creating default config.yml file");
+            nlb.log("Configuration has default version string");
+            nlb.cont("Creating a new configuration file for you.");
             plugin.saveDefaultConfig();
             plugin.reloadConfig();
             this.rawConfig = plugin.getConfig();
         }
 
-        plugin.saveResource("messages.yml", false);
+        nlb.log("Loading messages.yml from " + plugin.getDataFolder());
+        if(!new File(plugin.getDataFolder(), "messages.yml").exists()){
+            nlb.cont("messages.yml did not exist, creating it now.");
+            plugin.saveResource("messages.yml", false);
+        }
         this.rawMessages = YamlConfiguration.loadConfiguration(new File(plugin.getDataFolder(), "messages.yml"));
 
-        plugin.log("Loading configuration from " + config.getCurrentPath());
-
-        version = config.getString("version", "2.0.0");
+        version = config.getString("version", "2.1.0");
         notifyChannel = VersionChannel.valueOf(config.getString("notify_channel", "STABLE").toUpperCase());
         hash = config.getString("hash", "OLD");
         debug = config.getBoolean("debug", false);
@@ -70,6 +80,8 @@ public class Config {
         MigrateConfiguration();
 
         defaultBehavior = DefaultBehavior.valueOf(config.getString("default_behavior", "INHERIT").toUpperCase());
+
+        nlb.parent();
 
     }
 
@@ -89,14 +101,14 @@ public class Config {
         return defaultBehavior;
     }
 
-    public List<ConfigRule> getRules() {
+    public List<ConfigRule> getRules(NestedLogBuilder nlb) {
         List<ConfigRule> rules = new ArrayList<>();
         ConfigurationSection rulesSection = this.rawConfig.getConfigurationSection("rules");
         if (rulesSection != null) {
             for (String ruleKey : rulesSection.getKeys(false)) {
                 ConfigurationSection ruleSection = rulesSection.getConfigurationSection(ruleKey);
                 if (ruleSection != null) {
-                    rules.add(new ConfigRule(ruleSection, null));
+                    rules.add(new ConfigRule(ruleSection, null, nlb));
                 }
             }
         }
@@ -109,12 +121,12 @@ public class Config {
 
     public String getMessage(String key, Map<String, String> replacements) {
         if(rawMessages == null){
-            BetterKeepInventory.getInstance().log("Messages not loaded?? Check if messages.yml exists.");
+            BetterKeepInventory.getInstance().getLogger().warning("Messages not loaded?? Check if messages.yml exists.");
             return key;
         }
 
         if(!rawMessages.contains(key)){
-            BetterKeepInventory.getInstance().log("Did not find message with key: " + key);
+            BetterKeepInventory.getInstance().getLogger().warning("Messages not loaded?? Check if messages.yml exists.");
             return key;
         }
 
@@ -131,6 +143,8 @@ public class Config {
         String message = getMessage(key, replacements);
         if(!message.isEmpty()){
             ply.sendMessage(message);
+        }else{
+            ply.sendMessage(key);
         }
     }
 
