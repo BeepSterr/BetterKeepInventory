@@ -26,7 +26,7 @@ public class OnPlayerRespawn implements Listener {
         Player ply = event.getPlayer();
         NestedLogBuilder nlb = new NestedLogBuilder();
 
-        nlb.log("Player" + ply.getName() + " (" + ply.getUniqueId() + ") died.");
+        nlb.log("Player " + ply.getName() + " (" + ply.getUniqueId() + ") respawned.");
         nlb.spacer();
         nlb.cont("Phase 2/2 (Respawn)");
         nlb.cont("World: " + ply.getWorld().getName());

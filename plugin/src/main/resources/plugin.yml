@@ -29,6 +29,9 @@ permissions:
       betterkeepinventory.command.help: true
       betterkeepinventory.command.reload: true
       betterkeepinventory.command.registry: true
+      betterkeepinventory.command.debug: true
+      betterkeepinventory.command.debug.upload: true
+      betterkeepinventory.command.debug.verbose: true
       betterkeepinventory.version: true
       betterkeepinventory.version.notify: true
       betterkeepinventory.reload: true
@@ -51,6 +54,18 @@ permissions:
 
   betterkeepinventory.command.reload:
     description: Reload the plugin config
+    default: op
+
+  betterkeepinventory.command.debug:
+    description: Access debug commands
+    default: op
+
+  betterkeepinventory.command.debug.upload:
+    description: Upload debug logs to bin.lunega.dev
+    default: op
+
+  betterkeepinventory.command.debug.verbose:
+    description: Toggle verbose debug mode to see logs in real-time
     default: op
 
 commands:
