@@ -2,8 +2,7 @@ package com.beepsterr.betterkeepinventory.Content.Effects;
 
 import com.beepsterr.betterkeepinventory.BetterKeepInventory;
 import com.beepsterr.betterkeepinventory.Library.Utilities;
-import com.beepsterr.betterkeepinventory.api.LoggerInterface;
-import com.beepsterr.betterkeepinventory.api.Types.MaterialType;
+import com.beepsterr.betterkeepinventory.api.Types.MaterialList;
 import com.beepsterr.betterkeepinventory.api.Effect;
 import com.beepsterr.betterkeepinventory.api.Types.SlotType;
 import org.bukkit.Material;
@@ -29,7 +28,7 @@ public class DropItemEffect implements Effect {
     private List<String> nameFilters = List.of();
     private List<String> loreFilters = List.of();
     private SlotType slots = new SlotType(List.of());
-    private MaterialType items = new MaterialType(List.of());
+    private MaterialList items = new MaterialList(List.of());
 
     public DropItemEffect(ConfigurationSection config) {
         this.mode = Mode.valueOf(config.getString("mode", "SIMPLE").toUpperCase());
@@ -39,19 +38,19 @@ public class DropItemEffect implements Effect {
         ConfigurationSection filters = config.getConfigurationSection("filters");
         if(filters != null) {
             this.slots = new SlotType(Utilities.ConfigList(filters, "slots"));
-            this.items = new MaterialType(Utilities.ConfigList(filters, "items"));
+            this.items = new MaterialList(Utilities.ConfigList(filters, "items"));
             this.nameFilters = Utilities.ConfigList(filters, "name");
             this.loreFilters = Utilities.ConfigList(filters, "lore");
         }
     }
 
     @Override
-    public void onRespawn(Player ply, PlayerRespawnEvent event, LoggerInterface logger) {
+    public void onRespawn(Player ply, PlayerRespawnEvent event) {
         // Nothing on respawn
     }
 
     @Override
-    public void onDeath(Player ply, PlayerDeathEvent event, LoggerInterface logger) {
+    public void onDeath(Player ply, PlayerDeathEvent event) {
         BetterKeepInventory plugin = BetterKeepInventory.getInstance();
         Random rng = plugin.rng;
 
@@ -66,25 +65,25 @@ public class DropItemEffect implements Effect {
             var meta = item.getItemMeta();
 
             // Check the filters
-            if (!dropItems.isEmpty() && !this.items.isIncludeAll() && !dropItems.contains(item.getType())){
-                logger.log("Drop skipped due to item filter: " + item.getType());
+            if (!dropItems.isEmpty() && !dropItems.contains(item.getType())){
+                plugin.debug(ply, "Drop skipped due to item filter: " + item.getType());
                 continue;
             };
             if (!dropSlots.isEmpty() && !dropSlots.contains(i)){
-                logger.log("Drop skipped due to slot filter: " + item.getType() + " at slot " + i);
+                plugin.debug(ply, "Drop skipped due to slot filter: " + item.getType() + " at slot " + i);
                 continue;
             };
 
             if(meta != null){
                 if (!nameFilters.isEmpty() && !Utilities.advancedStringCompare(meta.getDisplayName(), nameFilters)){
-                    logger.log("Drop skipped due to name filter: " + item.getType() + " with name " + meta.getDisplayName());
+                    plugin.debug(ply, "Drop skipped due to name filter: " + item.getType() + " with name " + meta.getDisplayName());
                     continue;
                 };
                 if(meta.getLore() != null){
                     boolean loreFilterMatched = false;
                     for( String lore : meta.getLore()){
                         if (!loreFilters.isEmpty() && !Utilities.advancedStringCompare(lore, loreFilters)) {
-                            logger.log("Drop skipped due to lore filter: " + item.getType() + " with lore " + lore);
+                            plugin.debug(ply, "Drop skipped due to lore filter: " + item.getType() + " with lore " + lore);
                             loreFilterMatched = true;
                         }
                     }
@@ -117,8 +116,9 @@ public class DropItemEffect implements Effect {
 
             Map<String, String> replacements = new HashMap<>();
             replacements.put("amount", String.valueOf(removalCount));
-            replacements.put("item", MaterialType.GetName(item));
+            replacements.put("item", MaterialList.GetName(item));
             plugin.config.sendMessage(ply, "effects.drop", replacements);
+
             plugin.debug(ply, "DropItemEffect: Dropping " + removalCount + " items from slot " + i + " (" + item.getType() + ")");
 
             if (inventoryCount - removalCount < 0) {

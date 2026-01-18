@@ -1,0 +1,25 @@
+version: '3.8'
+
+services:
+  buildtools:
+    build:
+      context: .
+      args:
+        JAVA_VERSION: "17"
+    image: betterkeepinventory-buildtools:latest
+    environment:
+      # Set MC_REVISION to the Minecraft version you want to build, e.g. 1.16.5
+      MC_REVISION: "${MC_REVISION:-latest}"
+      # Optionally map host uid/gid to keep file ownership sane
+      HOST_UID: "${HOST_UID:-}"
+      HOST_GID: "${HOST_GID:-}"
+      # EXTRA_ARGS can pass additional flags to BuildTools if needed
+      EXTRA_ARGS: "${EXTRA_ARGS:-}"
+    volumes:
+      - ./jars:/jars
+    working_dir: /build
+    tty: false
+    stdin_open: false
+    restart: "no"
+    # Remove container after run when using `docker-compose run --rm`
+

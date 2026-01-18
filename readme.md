@@ -8,9 +8,7 @@ No longer shall your players jump into lava to get home. Weep they shall, for th
 *(This plugin lets take fine grained control over KeepInventory, choosing to drop certain items, damage durability and many more effects)*
 
 ## Downloads
-The plugin can be obtained here on GitHub or trough
-- [Modrinth](https://modrinth.com/plugin/betterkeepinventory)
-- [SpigotMC](https://www.spigotmc.org/resources/betterkeepinventory.93081/)
+The plugin can be obtained via [Modrinth](https://modrinth.com/plugin/betterkeepinventory)
 
 ## Supported Versions
 BetterKeepInventory supports the latest 3 major Minecraft versions, and is compiled using the native Java version of the oldest supported Minecraft version.
