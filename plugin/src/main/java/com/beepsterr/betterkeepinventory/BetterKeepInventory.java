@@ -1,10 +1,9 @@
 package com.beepsterr.betterkeepinventory;
 
 import com.beepsterr.betterkeepinventory.Commands.MainCommand;
-import com.beepsterr.betterkeepinventory.Content.Conditions.PermissionsCondition;
+import com.beepsterr.betterkeepinventory.Content.Conditions.*;
 import com.beepsterr.betterkeepinventory.Content.Conditions.PlaceholderAPI.PlaceholderCondition;
 import com.beepsterr.betterkeepinventory.Content.Conditions.Vault.VaultCondition;
-import com.beepsterr.betterkeepinventory.Content.Conditions.WorldsCondition;
 import com.beepsterr.betterkeepinventory.Content.Effects.*;
 import com.beepsterr.betterkeepinventory.Content.Effects.Vault.VaultEffect;
 import com.beepsterr.betterkeepinventory.Depends.BetterKeepInventoryPlaceholderExpansion;
@@ -134,6 +133,14 @@ public final class BetterKeepInventory extends JavaPlugin implements Listener {
         api.effectRegistry().register(this, "kick", KickEffect::new);
         nlb.log("ban");
         api.effectRegistry().register(this, "ban", BanEffect::new);
+        nlb.log("command");
+        api.effectRegistry().register(this, "command", CommandEffect::new);
+        nlb.log("sound");
+        api.effectRegistry().register(this, "sound", SoundEffect::new);
+        nlb.log("particles");
+        api.effectRegistry().register(this, "particles", ParticleEffect::new);
+        nlb.log("lightning");
+        api.effectRegistry().register(this, "lightning", LightningEffect::new);
 
         if(checkDependency("Vault")){
             nlb.log("vault");
@@ -153,6 +160,14 @@ public final class BetterKeepInventory extends JavaPlugin implements Listener {
         api.conditionRegistry().register(this, "worlds", WorldsCondition::new);
         nlb.log("permissions");
         api.conditionRegistry().register(this, "permissions", PermissionsCondition::new);
+        nlb.log("cause");
+        api.conditionRegistry().register(this, "cause", CauseCondition::new);
+        nlb.log("killer");
+        api.conditionRegistry().register(this, "killer", KillerCondition::new);
+        nlb.log("y_level");
+        api.conditionRegistry().register(this, "y_level", YLevelCondition::new);
+        nlb.log("light_level");
+        api.conditionRegistry().register(this, "light_level", LightLevelCondition::new);
 
         if(checkDependency("Vault")){
             nlb.log("vault");
