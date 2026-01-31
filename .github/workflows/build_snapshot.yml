@@ -101,6 +101,7 @@ jobs:
         with:
           name: BetterKeepInventory-${{ steps.versioning.outputs.version }}
           path: ./out/BetterKeepInventory-${{ steps.versioning.outputs.version }}.jar
+          retention-days: 180
 
       - uses: cloudnode-pro/modrinth-publish@v2
         with:

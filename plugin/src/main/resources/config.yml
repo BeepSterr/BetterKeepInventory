@@ -42,7 +42,7 @@ rules:
     conditions:
       worlds:
         nodes:
-          - "world_*"
+          - "world*"
     effects:
       damage:
         mode: "PERCENTAGE"
