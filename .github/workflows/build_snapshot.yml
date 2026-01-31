@@ -55,6 +55,14 @@ jobs:
         with:
           maven-version: 3.8.2
 
+      - name: Get latest release tag
+        id: latest_release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG=$(gh release view --json tagName -q '.tagName' 2>/dev/null || echo "")
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+
       - name: Generate snapshot version
         id: versioning
         env:
@@ -103,4 +111,6 @@ jobs:
           game-versions: '["1.21.x", "1.20.x", "1.19.x"]'
           files: ./out/BetterKeepInventory-${{ steps.versioning.outputs.version }}.jar
           channel: "alpha"
-          changelog: "Snapshot build ${{ steps.versioning.outputs.version }}. Snapshots are automatically generated and may contain untested changes, please use them with caution."
+          changelog: |
+            Snapshot build ${{ steps.versioning.outputs.version }}. Snapshots are automatically generated and may contain untested changes, please use them with caution.
+            ${{ steps.latest_release.outputs.tag && format('[View changes since {0}](https://github.com/{1}/compare/{0}...{2})', steps.latest_release.outputs.tag, github.repository, github.sha) || '' }}
