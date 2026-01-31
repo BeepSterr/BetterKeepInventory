@@ -2,6 +2,7 @@ version: '3.8'
 
 services:
   buildtools:
+    user: beep
     build:
       context: .
       args:

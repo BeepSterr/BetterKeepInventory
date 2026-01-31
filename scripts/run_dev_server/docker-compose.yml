@@ -1,5 +1,6 @@
 services:
   dev_server:
+    user: 1000:1001
     image: amazoncorretto:${JAVA_VERSION:-17}
     ports:
       - "25565:25565"

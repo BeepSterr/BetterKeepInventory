@@ -36,24 +36,23 @@ default_behavior: "INHERIT"
 # If you need additional help, feel free to ask in the Discord server.
 # You can define multiple rules, and they will be evaluated in the order they are defined.
 rules:
-
-#  example_rule:
-#    name: "Example Rule"
-#    enabled: false # <-- Look here!
-#    conditions:
-#      worlds:
-#        nodes:
-#          - "world_*"
-#    effects:
-#      damage:
-#        mode: "PERCENTAGE"
-#        min: 0.0
-#        max: 0.0 # Change if you want equipment to be damages
-#        filters:
-#          slots:
-#            - "ARMOR"
-#          items:
-#            - "G:ARMOR" # Material Group! Check the documentation for more information
+  example_rule:
+    name: "Example Rule"
+    enabled: false # <-- Look here!
+    conditions:
+      worlds:
+        nodes:
+          - "world_*"
+    effects:
+      damage:
+        mode: "PERCENTAGE"
+        min: 0.0
+        max: 0.0 # Change if you want equipment to be damaged
+        filters:
+          slots:
+            - "ARMOR" # Slot List! Check the https://bki.beepsterr.com/SlotLists for more information
+          items:
+            - "G:ARMOR" # Resource List! Check the https://bki.beepsterr.com/ResourceLists for more information
 
 # There is a lot more you can do, but to keep the default config slim and clean, we will not include it here.
 # Please do check the documentation linked on the top of this file for more information on how to configure the plugin

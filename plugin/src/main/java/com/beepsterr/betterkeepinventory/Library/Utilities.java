@@ -37,7 +37,11 @@ public class Utilities {
         if(section.contains(key) && section.isString(key)){
             return List.of(Objects.requireNonNull(section.getString(key)));
         }else{
-            return section.getStringList(key);
+            List<?> rawList = section.getList(key);
+            if (rawList == null) return List.of();
+            return rawList.stream()
+                    .map(Object::toString)
+                    .toList();
         }
     }
 
