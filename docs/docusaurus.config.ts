@@ -85,6 +85,11 @@ const config: Config = {
           dropdownActiveClassDisabled: true,
         },
         {
+          href: 'https://modrinth.com/plugin/betterkeepinventory/versions',
+          label: 'Download',
+          position: 'right',
+        },
+        {
           href: 'https://github.com/beepsterr/betterkeepinventory',
           label: 'GitHub',
           position: 'right',

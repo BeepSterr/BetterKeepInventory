@@ -60,7 +60,7 @@ items:
 A List of items that are affected by this effects.
 Defaults to all items.
 
-Supports [Resource Lists](../../ResourceLists) for item groups.
+Supports [Resource Lists](../../Types/ResourceLists.md) for item groups.
 
 ### Slots
 ```yaml

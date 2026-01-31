@@ -32,6 +32,8 @@ permissions:
       betterkeepinventory.version: true
       betterkeepinventory.version.notify: true
       betterkeepinventory.reload: true
+      betterkeepinventory.command.debug.verbose: true
+      betterkeepinventory.command.debug.upload: true
 
   betterkeepinventory.version:
     description: Able to view the plugins version in the main command
