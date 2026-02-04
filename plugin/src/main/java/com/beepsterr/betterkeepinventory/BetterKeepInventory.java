@@ -135,10 +135,6 @@ public final class BetterKeepInventory extends JavaPlugin implements Listener {
         api.effectRegistry().register(this, "ban", BanEffect::new);
         nlb.log("command");
         api.effectRegistry().register(this, "command", CommandEffect::new);
-        nlb.log("sound");
-        api.effectRegistry().register(this, "sound", SoundEffect::new);
-        nlb.log("particles");
-        api.effectRegistry().register(this, "particles", ParticleEffect::new);
         nlb.log("lightning");
         api.effectRegistry().register(this, "lightning", LightningEffect::new);
 
@@ -162,8 +158,6 @@ public final class BetterKeepInventory extends JavaPlugin implements Listener {
         api.conditionRegistry().register(this, "permissions", PermissionsCondition::new);
         nlb.log("cause");
         api.conditionRegistry().register(this, "cause", CauseCondition::new);
-        nlb.log("killer");
-        api.conditionRegistry().register(this, "killer", KillerCondition::new);
         nlb.log("y_level");
         api.conditionRegistry().register(this, "y_level", YLevelCondition::new);
         nlb.log("light_level");
