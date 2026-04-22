@@ -11,6 +11,8 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 
+import java.util.logging.Level;
+
 public class OnPlayerRespawn implements Listener {
 
     BetterKeepInventory plugin;
@@ -24,7 +26,7 @@ public class OnPlayerRespawn implements Listener {
     public void onPlayerRespawn(PlayerRespawnEvent event) {
 
         Player ply = event.getPlayer();
-        NestedLogBuilder nlb = new NestedLogBuilder();
+        NestedLogBuilder nlb = new NestedLogBuilder(Level.FINE);
 
         nlb.log("Player" + ply.getName() + " (" + ply.getUniqueId() + ") died.");
         nlb.spacer();

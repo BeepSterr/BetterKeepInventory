@@ -41,10 +41,10 @@ public class NestedLogBuilder implements LoggerInterface {
         return prefix.toString();
     }
 
-    // Warnings and errors always reach the console; informational output only when debug is on.
-    // Before Config finishes loading (startup), log everything so admins can see early failures.
+    // INFO and above always reach the console; sub-INFO (FINE/FINER/FINEST) only when debug is on.
+    // Before Config finishes loading (startup), fall back to "print" so early failures are visible.
     private boolean shouldPrint(Level level){
-        if(level.intValue() >= Level.WARNING.intValue()){
+        if(level.intValue() >= Level.INFO.intValue()){
             return true;
         }
         Config cfg = Config.getInstance();
@@ -53,7 +53,10 @@ public class NestedLogBuilder implements LoggerInterface {
 
     private void print(Level level, String msg){
         if(shouldPrint(level)){
-            logger.log(level, msg);
+            // Bukkit's plugin logger inherits the root INFO threshold, so emit sub-INFO
+            // messages at INFO when debug is enabled — otherwise JUL would drop them silently.
+            Level emitAt = level.intValue() < Level.INFO.intValue() ? Level.INFO : level;
+            logger.log(emitAt, msg);
         }
         BetterKeepInventory.getInstance().debugger.AddLine(msg);
     }
@@ -84,9 +87,7 @@ public class NestedLogBuilder implements LoggerInterface {
     public void parent(){
         if(depth > 0){
             String msg = getPrefix().replace(LOG_ENTRY, LOG_END);
-            if(shouldPrint(this.level)){
-                logger.log(this.level, msg);
-            }
+            print(this.level, msg);
             depth--;
         }
     }

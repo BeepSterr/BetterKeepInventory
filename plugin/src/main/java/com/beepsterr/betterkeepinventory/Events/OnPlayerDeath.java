@@ -26,7 +26,7 @@ public class OnPlayerDeath  implements Listener {
     public void onPlayerDeath(PlayerDeathEvent event) {
 
         Player ply = event.getEntity();
-        NestedLogBuilder nlb = new NestedLogBuilder(Level.INFO);
+        NestedLogBuilder nlb = new NestedLogBuilder(Level.FINE);
 
         nlb.log("Player" + ply.getName() + " (" + ply.getUniqueId() + ") died.");
         nlb.spacer();
