@@ -41,6 +41,23 @@ public class NestedLogBuilder implements LoggerInterface {
         return prefix.toString();
     }
 
+    // Warnings and errors always reach the console; informational output only when debug is on.
+    // Before Config finishes loading (startup), log everything so admins can see early failures.
+    private boolean shouldPrint(Level level){
+        if(level.intValue() >= Level.WARNING.intValue()){
+            return true;
+        }
+        Config cfg = Config.getInstance();
+        return cfg == null || cfg.isDebug();
+    }
+
+    private void print(Level level, String msg){
+        if(shouldPrint(level)){
+            logger.log(level, msg);
+        }
+        BetterKeepInventory.getInstance().debugger.AddLine(msg);
+    }
+
     public void SetDepth(int d){
         depth = d;
     }
@@ -59,8 +76,7 @@ public class NestedLogBuilder implements LoggerInterface {
         }else{
             msg += title;
         }
-        logger.log(this.level, msg);
-        BetterKeepInventory.getInstance().debugger.AddLine(msg);
+        print(this.level, msg);
         depth++;
 
     }
@@ -68,39 +84,36 @@ public class NestedLogBuilder implements LoggerInterface {
     public void parent(){
         if(depth > 0){
             String msg = getPrefix().replace(LOG_ENTRY, LOG_END);
-            logger.log(this.level, msg);
+            if(shouldPrint(this.level)){
+                logger.log(this.level, msg);
+            }
             depth--;
         }
     }
 
     public void log(Level level, String message){
         String msg = getPrefix() + " " + message;
-        logger.log(level, msg);
-        BetterKeepInventory.getInstance().debugger.AddLine(msg);
+        print(level, msg);
     }
 
     public void log(String message){
         String msg = getPrefix() + " " + message;
-        logger.log(this.level, msg);
-        BetterKeepInventory.getInstance().debugger.AddLine(msg);
+        print(this.level, msg);
     }
 
     public void cont(Level level, String message){
         String msg = getPrefix().replace(LOG_ENTRY, LOG_SPACER) + " " + message;
-        logger.log(level, msg);
-        BetterKeepInventory.getInstance().debugger.AddLine(msg);
+        print(level, msg);
     }
 
     public void cont(String message){
         String msg = getPrefix().replace(LOG_ENTRY, LOG_SPACER) + " " + message;
-        logger.log(this.level, msg);
-        BetterKeepInventory.getInstance().debugger.AddLine(msg);
+        print(this.level, msg);
     }
 
     public void spacer(){
         String msg = getPrefix().replace(LOG_ENTRY, LOG_SPACER) + " ";
-        logger.log(this.level, msg);
-        BetterKeepInventory.getInstance().debugger.AddLine(msg);
+        print(this.level, msg);
     }
 
     public void end(){
@@ -108,8 +121,7 @@ public class NestedLogBuilder implements LoggerInterface {
             parent();
         }
         String msg = getPrefix().replace(LOG_ENTRY, LOG_END);
-        logger.log(this.level, msg);
-        BetterKeepInventory.getInstance().debugger.AddLine(msg);
+        print(this.level, msg);
     }
 
 }
