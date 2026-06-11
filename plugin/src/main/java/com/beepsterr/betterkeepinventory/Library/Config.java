@@ -143,9 +143,8 @@ public class Config {
         String message = getMessage(key, replacements);
         if(!message.isEmpty()){
             ply.sendMessage(message);
-        }else{
-            ply.sendMessage(key);
         }
+        // An empty message means the user intentionally disabled it, so send nothing.
     }
 
     public void LoadMessages(BetterKeepInventory plugin) throws IOException {
