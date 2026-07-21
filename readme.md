@@ -17,7 +17,8 @@ BetterKeepInventory supports the latest 3 major Minecraft versions, and is compi
 |-------------------|------------------------------------------------------------------------|--------------|
 | 1.16 and below    | [1.3](https://modrinth.com/plugin/betterkeepinventory/version/1.3)     | 11           |
 | 1.17, 1.18        | [1.6.2](https://modrinth.com/plugin/betterkeepinventory/version/1.6.2) | 16           |
-| 1.19+             | [latest](https://modrinth.com/plugin/betterkeepinventory/versions)     | 17           |
+| 1.19-1.20         | [2.2.0](https://modrinth.com/plugin/betterkeepinventory/version/1.6.2) | 17           |
+| 1.21+             | [Latest](https://modrinth.com/plugin/betterkeepinventory/versions)     | 21           |
 
 > [!NOTE]  
 > Older versions can contain bugs that are not present in the latest version. I Recommend always running the latest minecraft version so you can benefit from the most recent plugins. You can always use a plugin like [ViaBackwards](https://www.spigotmc.org/resources/viabackwards.27448/) to allow players on older versions to connect to your server.
