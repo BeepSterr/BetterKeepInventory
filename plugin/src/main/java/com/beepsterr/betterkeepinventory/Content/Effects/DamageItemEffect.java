@@ -153,9 +153,9 @@ public class DamageItemEffect implements Effect {
 
     private int applyUnbreaking(ItemStack item, int damageToTake) {
         if (!useEnchantments) return damageToTake;
-        if (!item.getEnchantments().containsKey(Enchantment.DURABILITY)) return damageToTake;
+        if (!item.getEnchantments().containsKey(Enchantment.UNBREAKING)) return damageToTake;
 
-        int level = item.getEnchantmentLevel(Enchantment.DURABILITY);
+        int level = item.getEnchantmentLevel(Enchantment.UNBREAKING);
         if (level > 9) return 0; // interpreted as unbreakable
         return (int) (damageToTake * (1.0 - (0.33 * level)));
     }
