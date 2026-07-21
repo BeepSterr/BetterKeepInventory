@@ -1,7 +1,7 @@
 name: BetterKeepInventory
 version: ${project.version}
 main: com.beepsterr.betterkeepinventory.BetterKeepInventory
-api-version: 1.19
+api-version: 1.21
 prefix: BetterKeepInventory
 authors: [ BeepSterr ]
 website: leafcat.live
