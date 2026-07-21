@@ -108,9 +108,10 @@ public class DamageItemEffect implements Effect {
 
             int currentDamageTaken = damageableMeta.getDamage();
             int maxDurability = item.getType().getMaxDurability();
+            if (maxDurability <= 0) continue; // item can't hold durability (e.g. blocks/food) — skip so we don't tag it or spam "0 damage"
             int damageToTake = calculateDamage(rng, currentDamageTaken, maxDurability);
 
-            if (damageToTake < 0) continue;
+            if (damageToTake <= 0) continue;
 
             damageToTake = applyUnbreaking(item, damageToTake);
             Map<String, String> replacements = new HashMap<>();
