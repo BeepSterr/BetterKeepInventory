@@ -13,3 +13,7 @@ updates:
     directory: "/api" # Location of package manifests
     schedule:
       interval: "daily"
+  - package-ecosystem: "github-actions" # Keeps workflow actions (incl. SHA-pinned ones) up to date
+    directory: "/" # Scans .github/workflows
+    schedule:
+      interval: "daily"
