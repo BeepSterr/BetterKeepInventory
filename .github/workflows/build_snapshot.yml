@@ -103,15 +103,17 @@ jobs:
           path: ./out/BetterKeepInventory-${{ steps.versioning.outputs.version }}.jar
           retention-days: 180
 
-      - uses: cloudnode-pro/modrinth-publish@v2
+      - uses: Kira-NT/mc-publish@v3.3.1
         with:
-          token: ${{ secrets.MODRINTH_TOKEN }}
-          project: "j0QDn41h"
+          modrinth-id: j0QDn41h
+          modrinth-token: ${{ secrets.MODRINTH_TOKEN }}
+          curseforge-id: 1113203
+          curseforge-token: ${{ secrets.CURSEFORGE_TOKEN }}
           version: "${{ steps.versioning.outputs.version }}"
+          version-type: alpha
           loaders: '["spigot", "paper", "purpur", "folia"]'
           game-versions: '["1.21.x", "26.x"]'
           files: ./out/BetterKeepInventory-${{ steps.versioning.outputs.version }}.jar
-          channel: "alpha"
           changelog: |
             Snapshot build ${{ steps.versioning.outputs.version }}. Snapshots are automatically generated and may contain untested changes, please use them with caution.
             ${{ steps.latest_release.outputs.tag && format('[View changes since {0}](https://github.com/{1}/compare/{0}...{2})', steps.latest_release.outputs.tag, github.repository, github.sha) || '' }}
