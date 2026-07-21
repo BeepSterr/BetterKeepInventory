@@ -40,7 +40,7 @@ const config: Config = {
       'classic',
       {
         docs: {
-          lastVersion: '2.2.0',
+          lastVersion: '2.3.0',
           versions: {
             current: {
               label: 'Snapshots',
