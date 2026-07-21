@@ -69,13 +69,21 @@ jobs:
           name: BetterKeepInventory-${{ steps.versioning.outputs.version }}
           path: ./out/BetterKeepInventory-${{ steps.versioning.outputs.version }}.jar
 
-      - uses: cloudnode-pro/modrinth-publish@v2
+      - uses: Kira-NT/mc-publish@52307b03863581dec6b652b83e597aec02ebb075 # v3.3.1
         with:
-          token: ${{ secrets.MODRINTH_TOKEN }}
-          project: "j0QDn41h"
+          modrinth-id: j0QDn41h
+          modrinth-token: ${{ secrets.MODRINTH_TOKEN }}
+          curseforge-id: 1113203
+          curseforge-token: ${{ secrets.CURSEFORGE_TOKEN }}
           version: "${{ steps.versioning.outputs.version }}"
-          loaders: '["spigot", "paper", "purpur", "folia"]'
-          game-versions: '["1.21.x", "26.x"]'
+          version-type: release
+          loaders: |
+            spigot
+            paper
+            purpur
+            folia
+          game-versions: |
+            1.21.x
+            26.x
           files: ./out/BetterKeepInventory-${{ steps.versioning.outputs.version }}.jar
-          channel: "release"
           changelog: "Release ${{ steps.versioning.outputs.version }}. See the [GitHub Releases](https://github.com/beepsterr/betterkeepinventory/releases/tag/v${{ steps.versioning.outputs.version }}) for details."
