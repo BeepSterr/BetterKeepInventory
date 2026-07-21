@@ -111,8 +111,14 @@ jobs:
           curseforge-token: ${{ secrets.CURSEFORGE_TOKEN }}
           version: "${{ steps.versioning.outputs.version }}"
           version-type: alpha
-          loaders: '["spigot", "paper", "purpur", "folia"]'
-          game-versions: '["1.21.x", "26.x"]'
+          loaders: |
+            spigot
+            paper
+            purpur
+            folia
+          game-versions: |
+            1.21.x
+            26.x
           files: ./out/BetterKeepInventory-${{ steps.versioning.outputs.version }}.jar
           changelog: |
             Snapshot build ${{ steps.versioning.outputs.version }}. Snapshots are automatically generated and may contain untested changes, please use them with caution.

@@ -77,7 +77,13 @@ jobs:
           curseforge-token: ${{ secrets.CURSEFORGE_TOKEN }}
           version: "${{ steps.versioning.outputs.version }}"
           version-type: release
-          loaders: '["spigot", "paper", "purpur", "folia"]'
-          game-versions: '["1.21.x", "26.x"]'
+          loaders: |
+            spigot
+            paper
+            purpur
+            folia
+          game-versions: |
+            1.21.x
+            26.x
           files: ./out/BetterKeepInventory-${{ steps.versioning.outputs.version }}.jar
           changelog: "Release ${{ steps.versioning.outputs.version }}. See the [GitHub Releases](https://github.com/beepsterr/betterkeepinventory/releases/tag/v${{ steps.versioning.outputs.version }}) for details."
