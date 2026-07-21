@@ -7,7 +7,7 @@ authors: [ BeepSterr ]
 website: leafcat.live
 description: Customize the KeepInventory behavior on your server with rules and conditions.
 
-softdepend: [Vault,Towny,Essentials,GriefPrevention,PlaceholderAPI]
+softdepend: [Vault,Essentials,PlaceholderAPI]
 
 # Folia
 folia-supported: true
