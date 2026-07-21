@@ -79,7 +79,7 @@ A String or list of strings for item names that the affected item must have. Sup
 
 ### Lore
 ```yaml
-name:
+lore:
   - 'Dropped on death'
 ```
 A String or list of strings for item lore lines that the affected item must have. Supports `!` to negate the filter.

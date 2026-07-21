@@ -1,5 +1,5 @@
 # Hunger
-Determines what should happen to the player’s EXP level on death.
+Determines how much hunger the player loses on death.
 ```yaml
 effects:
   hunger:
@@ -18,6 +18,6 @@ The minimum hunger level the player should respawn with
 
 ### amount
 ```yml
-max: 2
+amount: 2
 ```
 The amount of hunger points to lose by dying

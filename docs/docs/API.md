@@ -11,7 +11,7 @@ The easiest way to get a hold of the API is to use JitPack. Just add your depend
     </repository>
 </repositories>
 
-<depencencies>
+<dependencies>
     <dependency>
         <!-- Keep not that we're using the 'betterkeepinventory-api' artifact -->
         <groupId>com.github.BeepSterr.BetterKeepInventory</groupId>
@@ -21,7 +21,7 @@ The easiest way to get a hold of the API is to use JitPack. Just add your depend
         <!-- If you don't do this, you will not be able to register anything -->
         <scope>provided</scope>
     </dependency>
-</depencencies>
+</dependencies>
 ```
 
 ### Adding a Condition

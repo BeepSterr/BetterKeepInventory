@@ -1,5 +1,5 @@
 # Kick
-Determines what should happen to the player’s EXP level on death.
+Disconnects the player from the server on death with a custom message.
 ```yaml
 effects:
   kick:

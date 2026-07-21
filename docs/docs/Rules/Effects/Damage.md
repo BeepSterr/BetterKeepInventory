@@ -1,5 +1,5 @@
 # Damage
-Determines the items that should still be dropped on death.
+Determines how much durability damage items take on death.
 ```yaml
 effects:
   damage:
@@ -89,7 +89,7 @@ A String or list of strings for item names that the affected item must have. Sup
 
 ### Lore
 ```yaml
-name:
+lore:
   - 'Dropped on death'
 ```
 A String or list of strings for item lore lines that the affected item must have. Supports `!` to negate the filter.

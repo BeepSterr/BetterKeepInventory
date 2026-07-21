@@ -1,5 +1,5 @@
 # Vault
-The player must die in **ANY** of the matched worlds.
+The player's economy balance (via Vault) must be **at least** the configured minimum.
 
 ```yaml
 conditions:

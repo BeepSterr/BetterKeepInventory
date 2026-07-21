@@ -1,13 +1,13 @@
 # Vault
-Determines what should happen to the player’s EXP level on death.
+Determines how much money the player loses (via Vault) on death.
 ```yaml
 effects:
   vault:
     mode: "SIMPLE"
-      min: 50
-      max: 50 #Lose $50 for dying
-      allow_negative_balance: false
-      # let's not be too mean, ok?
+    min: 50
+    max: 50 #Lose $50 for dying
+    allow_negative_balance: false
+    # let's not be too mean, ok?
 ```
 
 ### mode
