@@ -1,125 +1,29 @@
-name: Snapshot Build
+name: Snapshot build
 
+# Weekly snapshot: builds & publishes an alpha every Monday if there were commits that week.
+# Delegates to the shared reusable snapshot workflow. .github/workflows/build_snapshot.yml.
 on:
   workflow_dispatch:
   schedule:
-    - cron: '0 10 * * *' # Every day at 10:00 UTC
-
-permissions:
-  contents: read
-  actions: read
+    - cron: '0 10 * * 1' # Mondays 10:00 UTC
 
 jobs:
-  check-recent-commits:
-    runs-on: ubuntu-latest
-    outputs:
-      recent: ${{ steps.check.outputs.recent }}
-      count: ${{ steps.check.outputs.count }}
-    steps:
-      - name: Check for commits in last 24h
-        id: check
-        env:
-          GH_REPO: ${{ github.repository }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          SINCE=$(date -u -d '24 hours ago' '+%Y-%m-%dT%H:%M:%SZ')
-          COUNT=$(curl -s -H "Authorization: Bearer ${GITHUB_TOKEN}" \
-            "https://api.github.com/repos/${GH_REPO}/commits?since=${SINCE}" \
-            | jq 'length')
-          echo "Commits in last 24h: ${COUNT}"
-          echo "count=${COUNT}" >> "$GITHUB_OUTPUT"
-          if [ "${COUNT}" -gt 0 ]; then
-            echo "recent=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "recent=false" >> "$GITHUB_OUTPUT"
-          fi
-
-  build-snapshot:
-    name: Build Snapshot
-    needs: check-recent-commits
-    if: ${{ github.event_name == 'workflow_dispatch' || needs.check-recent-commits.outputs.recent == 'true' }}
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Set up JDK
-        uses: actions/setup-java@v4
-        with:
-          java-version: '21'
-          distribution: 'temurin'
-
-      - name: Install Maven
-        uses: stCarolas/setup-maven@v4.2
-        with:
-          maven-version: 3.8.2
-
-      - name: Get latest release tag
-        id: latest_release
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          TAG=$(gh release view --json tagName -q '.tagName' 2>/dev/null || echo "")
-          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
-
-      - name: Generate snapshot version
-        id: versioning
-        env:
-          REPO: ${{ github.repository }}
-          TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          BASE_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
-          DATE=$(date +'%y%m%d') # Format: YYMMDD
-          API_URL="https://api.github.com/repos/${REPO}/actions/artifacts"
-          
-          # Count matching snapshot builds for the current date
-          BUILD_COUNT=$(curl -s -H "Authorization: Bearer $TOKEN" "$API_URL" \
-            | jq "[.artifacts[] | select(.name | startswith(\"BetterKeepInventory-${BASE_VERSION}-SNAPSHOT-${DATE}\"))] | length")
-          
-          BUILD_COUNT=$((BUILD_COUNT + 1))
-          VERSION="${BASE_VERSION}-SNAPSHOT-${DATE}${BUILD_COUNT}"
-          
-          echo "Generated version: $VERSION"
-          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
-
-
-      - name: Apply version
-        run: |
-          mvn versions:set -DnewVersion=${{ steps.versioning.outputs.version }} -DgenerateBackupPoms=false
-
-      - name: Build project
-        run: mvn clean package -DskipTests
-
-      - name: Rename JAR
-        run: |
-          mkdir out
-          mv ./plugin/target/BetterKeepInventory-*.jar ./out/BetterKeepInventory-${{ steps.versioning.outputs.version }}.jar
-
-      - name: Upload Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: BetterKeepInventory-${{ steps.versioning.outputs.version }}
-          path: ./out/BetterKeepInventory-${{ steps.versioning.outputs.version }}.jar
-          retention-days: 180
-
-      - uses: Kira-NT/mc-publish@52307b03863581dec6b652b83e597aec02ebb075 # v3.3.1
-        with:
-          modrinth-id: j0QDn41h
-          modrinth-token: ${{ secrets.MODRINTH_TOKEN }}
-          curseforge-id: 1113203
-          curseforge-token: ${{ secrets.CURSEFORGE_TOKEN }}
-          version: "${{ steps.versioning.outputs.version }}"
-          version-type: alpha
-          loaders: |
-            spigot
-            paper
-            purpur
-            folia
-          game-versions: |
-            1.21.x
-            26.x
-          files: ./out/BetterKeepInventory-${{ steps.versioning.outputs.version }}.jar
-          changelog: |
-            Snapshot build ${{ steps.versioning.outputs.version }}. Snapshots are automatically generated and may contain untested changes, please use them with caution.
-            ${{ steps.latest_release.outputs.tag && format('[View changes since {0}](https://github.com/{1}/compare/{0}...{2})', steps.latest_release.outputs.tag, github.repository, github.sha) || '' }}
+  snapshot:
+    uses: Beeps-Workshop/.github/.github/workflows/snapshot.yml@main
+    with:
+      build-system: maven
+      artifact-name: BetterKeepInventory
+      jar-glob: plugin/target/BetterKeepInventory-*.jar
+      modrinth-id: j0QDn41h
+      curseforge-id: '1113203'
+      loaders: |
+        spigot
+        paper
+        purpur
+        folia
+      game-versions: |
+        1.21.x
+        26.x
+      java-version: '21'
+      force: ${{ github.event_name == 'workflow_dispatch' }}
+    secrets: inherit
