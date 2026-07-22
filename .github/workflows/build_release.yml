@@ -1,89 +1,51 @@
 name: Release build
 
+# BetterKeepInventory's release orchestrator: derives the version from the tag, then calls the shared
+# reusable workflows to build -> publish. Maven plugin. .github/workflows/build_release.yml.
 on:
   release:
     types: [created]
   workflow_dispatch:
     inputs:
       tag:
-        description: 'Tag to build and upload'
+        description: 'Tag to build (e.g. v2.3.0)'
         required: true
 
 jobs:
-  build-release:
-    name: Build Release
+  prepare:
     runs-on: ubuntu-latest
-
+    outputs:
+      version: ${{ steps.v.outputs.version }}
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Set up JDK
-        uses: actions/setup-java@v4
-        with:
-          java-version: '21'
-          distribution: 'temurin'
-
-      - name: Install Maven
-        uses: stCarolas/setup-maven@v4.2
-        with:
-          maven-version: 3.8.2
-
-      - name: Determine version
-        id: versioning
+      - id: v
         run: |
-          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
-            RAW_TAG="${{ github.event.inputs.tag }}"
-          else
-            RAW_TAG="${GITHUB_REF##*/}"
-          fi
+          RAW="${{ github.event.release.tag_name || github.event.inputs.tag }}"
+          echo "version=${RAW#v}" >> "$GITHUB_OUTPUT"
 
-          VERSION="${RAW_TAG#v}"  # Strip leading 'v'
-          echo "Using tag: $RAW_TAG -> version: $VERSION"
-          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+  build:
+    needs: prepare
+    uses: Beeps-Workshop/.github/.github/workflows/build.yml@main
+    with:
+      build-system: maven
+      version: ${{ needs.prepare.outputs.version }}
+      artifact-name: BetterKeepInventory
+      jar-glob: plugin/target/BetterKeepInventory-*.jar
 
-      - name: Apply version
-        run: |
-          mvn versions:set -DnewVersion=${{ steps.versioning.outputs.version }} -DgenerateBackupPoms=false
-
-      - name: Build JAR
-        run: mvn clean package -DskipTests
-
-      - name: Rename JAR
-        run: |
-          mkdir out
-          mv ./plugin/target/BetterKeepInventory-*.jar ./out/BetterKeepInventory-${{ steps.versioning.outputs.version }}.jar
-
-      - name: Upload to Release
-        if: github.event_name == 'release'
-        uses: softprops/action-gh-release@v2
-        with:
-          files: ./out/BetterKeepInventory-${{ steps.versioning.outputs.version }}.jar
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Upload Artifact (fallback/manual use)
-        if: github.event_name != 'release'
-        uses: actions/upload-artifact@v4
-        with:
-          name: BetterKeepInventory-${{ steps.versioning.outputs.version }}
-          path: ./out/BetterKeepInventory-${{ steps.versioning.outputs.version }}.jar
-
-      - uses: Kira-NT/mc-publish@52307b03863581dec6b652b83e597aec02ebb075 # v3.3.1
-        with:
-          modrinth-id: j0QDn41h
-          modrinth-token: ${{ secrets.MODRINTH_TOKEN }}
-          curseforge-id: 1113203
-          curseforge-token: ${{ secrets.CURSEFORGE_TOKEN }}
-          version: "${{ steps.versioning.outputs.version }}"
-          version-type: release
-          loaders: |
-            spigot
-            paper
-            purpur
-            folia
-          game-versions: |
-            1.21.x
-            26.x
-          files: ./out/BetterKeepInventory-${{ steps.versioning.outputs.version }}.jar
-          changelog: "Release ${{ steps.versioning.outputs.version }}. See the [GitHub Releases](https://github.com/beepsterr/betterkeepinventory/releases/tag/v${{ steps.versioning.outputs.version }}) for details."
+  release:
+    needs: [prepare, build]
+    uses: Beeps-Workshop/.github/.github/workflows/release.yml@main
+    with:
+      version: ${{ needs.prepare.outputs.version }}
+      artifact-name: BetterKeepInventory
+      modrinth-id: j0QDn41h
+      curseforge-id: '1113203'
+      loaders: |
+        spigot
+        paper
+        purpur
+        folia
+      game-versions: |
+        1.21.x
+        26.x
+      version-type: release
+    secrets: inherit
