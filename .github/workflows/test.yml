@@ -2,12 +2,18 @@ name: Tests
 
 # Runs the unit test suite (JUnit 5 + MockBukkit) on every push and PR.
 # Fast feedback so the effect/condition matrix doesn't have to be re-verified by hand.
+# Surefire JUnit XML is published back to the PR as a check + comment.
 # .github/workflows/test.yml
 on:
   push:
     branches: [master]
   pull_request:
   workflow_dispatch:
+
+permissions:
+  contents: read
+  checks: write        # create the "Test Results" check run
+  pull-requests: write # post/update the results comment on the PR
 
 jobs:
   test:
@@ -23,5 +29,16 @@ jobs:
           cache: maven
 
       - name: Run tests
-        # Full reactor so both the api and plugin module test suites run.
-        run: mvn -B --no-transfer-progress test
+        # Full reactor so both the api and plugin module suites run.
+        # -fae (fail at end) keeps going after a failing module so the report is complete.
+        run: mvn -B --no-transfer-progress -fae test
+
+      - name: Publish test results
+        # Parses Surefire's JUnit XML into a PR check + comment. Runs even when tests
+        # failed (that's exactly when the report matters); the job still fails overall
+        # because the "Run tests" step returned non-zero.
+        uses: EnricoMi/publish-unit-test-result-action@v2
+        if: always()
+        with:
+          files: "**/target/surefire-reports/*.xml"
+          check_name: Test Results
