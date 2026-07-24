@@ -23,11 +23,10 @@ public class BanEffect implements Effect {
         this.message = config.getString("message", "You died!");
         String durationString = config.getString("duration", "5m").toLowerCase();
 
-        if(durationString.equals("permanent")) {
+        if(durationString.equals("forever")) {
+            // No time limit; banned until manually unbanned.
             this.expiration = null;
-        }
-
-        if(durationString.endsWith("s")){
+        } else if(durationString.endsWith("s")){
             long seconds = Long.parseLong(durationString.replace("s", ""));
             this.expiration = Duration.ofSeconds(seconds);
         } else if(durationString.endsWith("m")){
