@@ -142,18 +142,19 @@ class BanEffectTest {
     }
 
     @Test
-    void permanentDurationCreatesNonExpiringBan() {
-        // Contract: "permanent" means a ban that never expires. This is currently RED —
-        // BanEffect's permanent branch sets expiration=null but doesn't return, so it falls
-        // through to Long.parseLong("permanent") and throws NumberFormatException. This test
-        // asserts the INTENDED behaviour and must stay failing until BanEffect is fixed;
+    void foreverDurationCreatesNonExpiringBan() {
+        // Contract (per docs Rules/Effects/Ban.md): duration "forever" = "No time limit,
+        // banned until manually unbanned". This is currently RED on two counts: BanEffect
+        // checks the wrong keyword ("permanent" instead of "forever"), and even that branch
+        // doesn't return, so "forever" falls through to Long.parseLong("forever") and throws.
+        // This asserts the documented behaviour and must stay failing until BanEffect is fixed;
         // do not weaken it to match the bug.
-        effect("dead", "permanent").onDeath(player, null, new NoopLogger());
+        effect("dead", "forever").onDeath(player, null, new NoopLogger());
         server.getScheduler().performTicks(1);
 
         BanEntry<?> entry = banList().getBanEntry(player.getName());
-        assertNotNull(entry, "permanent duration should still ban the player");
-        assertNull(entry.getExpiration(), "a permanent ban must not have an expiry");
+        assertNotNull(entry, "a 'forever' duration should still ban the player");
+        assertNull(entry.getExpiration(), "a 'forever' ban must not have an expiry");
     }
 
     /**
