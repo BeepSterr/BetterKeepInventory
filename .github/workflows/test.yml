@@ -37,7 +37,7 @@ jobs:
         # Parses Surefire's JUnit XML into a PR check + comment. Runs even when tests
         # failed (that's exactly when the report matters); the job still fails overall
         # because the "Run tests" step returned non-zero.
-        uses: EnricoMi/publish-unit-test-result-action@v2
+        uses: EnricoMi/publish-unit-test-result-action@d0a4676d0e0b938bc201470d88276b7c74c712b3 # v2.24.0
         if: always()
         with:
           files: "**/target/surefire-reports/*.xml"
