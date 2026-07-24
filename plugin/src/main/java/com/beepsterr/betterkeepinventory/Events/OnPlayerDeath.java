@@ -26,7 +26,9 @@ public class OnPlayerDeath  implements Listener {
     public void onPlayerDeath(PlayerDeathEvent event) {
 
         Player ply = event.getEntity();
-        NestedLogBuilder nlb = new NestedLogBuilder(Level.INFO);
+        // Only surface the full rule-evaluation tree in the console when debug is on.
+        // At FINE it is still captured for `/bki debug upload`, just hidden from the default handler.
+        NestedLogBuilder nlb = new NestedLogBuilder(plugin.config.isDebug() ? Level.INFO : Level.FINE);
 
         nlb.log("Player" + ply.getName() + " (" + ply.getUniqueId() + ") died.");
         nlb.spacer();

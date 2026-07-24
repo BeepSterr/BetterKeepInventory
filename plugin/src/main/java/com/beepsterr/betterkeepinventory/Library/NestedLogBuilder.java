@@ -49,7 +49,8 @@ public class NestedLogBuilder implements LoggerInterface {
 
         // if we haven't created a root log entry yet there is no point in creating a child.
         if(depth == -1){
-            logger.severe(title);
+            logger.log(this.level, title);
+            BetterKeepInventory.getInstance().debugger.AddLine(title);
             return;
         }
 
