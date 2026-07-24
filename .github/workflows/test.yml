@@ -42,3 +42,15 @@ jobs:
         with:
           files: "**/target/surefire-reports/*.xml"
           check_name: Test Results
+
+      - name: Publish coverage
+        # Posts a JaCoCo coverage summary (overall + changed files) as a PR comment.
+        # Only on PRs (needs a PR to comment on); min-coverage 0 = report only, no gate.
+        uses: madrapps/jacoco-report@e51ce1f46f7f8b5331593f935e59cbaf44b84920 # v1.8.0
+        if: ${{ github.event_name == 'pull_request' }}
+        with:
+          paths: ${{ github.workspace }}/api/target/site/jacoco/jacoco.xml, ${{ github.workspace }}/plugin/target/site/jacoco/jacoco.xml
+          token: ${{ secrets.GITHUB_TOKEN }}
+          title: Coverage
+          min-coverage-overall: 0
+          min-coverage-changed-files: 0
