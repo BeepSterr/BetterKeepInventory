@@ -4,7 +4,7 @@ name: Release build
 # reusable workflows to build -> publish. Maven plugin. .github/workflows/build_release.yml.
 on:
   release:
-    types: [created]
+    types: [published]
   workflow_dispatch:
     inputs:
       tag:
@@ -33,6 +33,8 @@ jobs:
 
   release:
     needs: [prepare, build]
+    permissions:
+      contents: write # release.yml attaches the built jar to the GitHub Release
     uses: Beeps-Workshop/.github/.github/workflows/release.yml@main
     with:
       version: ${{ needs.prepare.outputs.version }}
