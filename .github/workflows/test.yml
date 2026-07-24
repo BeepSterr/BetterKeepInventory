@@ -23,4 +23,5 @@ jobs:
           cache: maven
 
       - name: Run tests
-        run: mvn -B --no-transfer-progress -pl plugin -am test
+        # Full reactor so both the api and plugin module test suites run.
+        run: mvn -B --no-transfer-progress test
