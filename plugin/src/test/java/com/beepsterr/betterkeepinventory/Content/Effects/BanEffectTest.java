@@ -20,7 +20,7 @@ import java.util.Date;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -142,11 +142,18 @@ class BanEffectTest {
     }
 
     @Test
-    void permanentDurationCurrentlyThrows() {
-        // Documents a production bug: "permanent" is meant to mean a non-expiring ban, but the
-        // parsing falls through to Long.parseLong("permanent") and throws. Kept as a
-        // characterization test so the behaviour is visible; see PR notes.
-        assertThrows(NumberFormatException.class, () -> effect("dead", "permanent"));
+    void permanentDurationCreatesNonExpiringBan() {
+        // Contract: "permanent" means a ban that never expires. This is currently RED —
+        // BanEffect's permanent branch sets expiration=null but doesn't return, so it falls
+        // through to Long.parseLong("permanent") and throws NumberFormatException. This test
+        // asserts the INTENDED behaviour and must stay failing until BanEffect is fixed;
+        // do not weaken it to match the bug.
+        effect("dead", "permanent").onDeath(player, null, new NoopLogger());
+        server.getScheduler().performTicks(1);
+
+        BanEntry<?> entry = banList().getBanEntry(player.getName());
+        assertNotNull(entry, "permanent duration should still ban the player");
+        assertNull(entry.getExpiration(), "a permanent ban must not have an expiry");
     }
 
     /**
