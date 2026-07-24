@@ -34,7 +34,7 @@ import java.util.Objects;
 import java.util.Random;
 import java.util.logging.Level;
 
-public final class BetterKeepInventory extends JavaPlugin implements Listener {
+public class BetterKeepInventory extends JavaPlugin implements Listener {
 
     public Config config;
     static public BetterKeepInventory instance;

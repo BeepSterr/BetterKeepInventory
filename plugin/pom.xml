@@ -40,9 +40,36 @@
             <id>tcoded-releases</id>
             <url>https://repo.tcoded.com/releases</url>
         </repository>
+        <repository>
+            <id>papermc</id>
+            <url>https://repo.papermc.io/repository/maven-public/</url>
+        </repository>
     </repositories>
 
+    <dependencyManagement>
+        <dependencies>
+            <!-- Aligns all JUnit 5/6 artifacts (incl. those pulled in transitively by MockBukkit) -->
+            <dependency>
+                <groupId>org.junit</groupId>
+                <artifactId>junit-bom</artifactId>
+                <version>6.0.3</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
     <dependencies>
+        <!-- Test-only: MockBukkit mocks the Paper API (a superset of spigot-api), so
+             it must be on the test classpath. Declared BEFORE spigot-api so Paper's
+             org.bukkit.* wins for tests. Production still SHIPS against spigot-api
+             (below, provided) — the compile target is what guarantees Spigot support. -->
+        <dependency>
+            <groupId>io.papermc.paper</groupId>
+            <artifactId>paper-api</artifactId>
+            <version>1.21.11-R0.1-SNAPSHOT</version>
+            <scope>test</scope>
+        </dependency>
         <dependency>
             <groupId>org.spigotmc</groupId>
             <artifactId>spigot-api</artifactId>
@@ -79,6 +106,20 @@
             <version>0.5.1</version>
             <scope>compile</scope>
         </dependency>
+
+        <!-- Testing: MockBukkit spins up a mock 1.21 server so effects/conditions
+             can be exercised without a real Minecraft server. -->
+        <dependency>
+            <groupId>org.mockbukkit.mockbukkit</groupId>
+            <artifactId>mockbukkit-v1.21</artifactId>
+            <version>4.110.0</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>
@@ -109,6 +150,11 @@
                     <source>21</source>
                     <target>21</target>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>3.5.2</version>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
