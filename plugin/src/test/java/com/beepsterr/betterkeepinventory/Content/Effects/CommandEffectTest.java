@@ -58,6 +58,13 @@ class CommandEffectTest {
         return new CommandEffect(cfg);
     }
 
+    private static CommandEffect respawnEffect(String command, String executor) {
+        MemoryConfiguration cfg = new MemoryConfiguration();
+        cfg.set("on_respawn", List.of(command));
+        cfg.set("executor", executor);
+        return new CommandEffect(cfg);
+    }
+
     @Test
     void consoleCommandRunsWithPlaceholdersSubstituted() {
         effect("capture %player%", "CONSOLE").onDeath(player, null, new NoopLogger());
@@ -65,6 +72,26 @@ class CommandEffectTest {
 
         assertEquals(1, captured.size(), "the configured command should have been dispatched once");
         assertEquals(player.getName(), captured.get(0)[0], "%player% should be replaced with the player's name");
+    }
+
+    @Test
+    void playerExecutorRunsCommandWithPlaceholdersSubstituted() {
+        effect("capture %player%", "PLAYER").onDeath(player, null, new NoopLogger());
+        server.getScheduler().performTicks(3); // dispatch is scheduled one tick out
+
+        assertEquals(1, captured.size(), "the configured command should have been dispatched once as the player");
+        assertEquals(player.getName(), captured.get(0)[0], "%player% should be replaced with the player's name");
+    }
+
+    @Test
+    void playerExecutorRunsOnRespawnCommands() {
+        respawnEffect("capture %player% %world%", "PLAYER").onRespawn(player, null, new NoopLogger());
+        server.getScheduler().performTicks(3);
+
+        assertEquals(1, captured.size(), "on_respawn command should have been dispatched once");
+        String[] args = captured.get(0);
+        assertEquals(player.getName(), args[0], "%player% should be substituted on respawn");
+        assertEquals("world", args[1], "%world% should be substituted on respawn");
     }
 
     @Test

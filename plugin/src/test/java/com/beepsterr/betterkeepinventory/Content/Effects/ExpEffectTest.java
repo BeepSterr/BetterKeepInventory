@@ -6,11 +6,16 @@ import org.bukkit.configuration.MemoryConfiguration;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.bukkit.entity.ExperienceOrb;
 import org.mockbukkit.mockbukkit.MockBukkit;
 import org.mockbukkit.mockbukkit.ServerMock;
 import org.mockbukkit.mockbukkit.entity.PlayerMock;
 
+import java.util.Collection;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * ExpEffect removes XP levels on death. These cover the DELETE path (deterministic level math)
@@ -69,5 +74,55 @@ class ExpEffectTest {
         player.setLevel(0);
         effect("ALL", "DELETE", 0, 0).onDeath(player, null, new NoopLogger()); // 0 levels -> early return
         assertEquals(0, player.getLevel());
+    }
+
+    private Collection<ExperienceOrb> orbsInWorld() {
+        return player.getWorld().getEntitiesByClass(ExperienceOrb.class);
+    }
+
+    @Test
+    void allModeDropSpawnsOrbAndZeroesLevel() {
+        player.setLevel(30);
+        // ALL -> loses every level; DROP branch takes playerExpLevel <= levelsToLose -> setLevel(0).
+        effect("ALL", "DROP", 0, 0).onDeath(player, null, new NoopLogger());
+
+        assertEquals(0, player.getLevel());
+        Collection<ExperienceOrb> orbs = orbsInWorld();
+        assertEquals(1, orbs.size(), "DROP should spawn exactly one ExperienceOrb");
+        assertTrue(orbs.iterator().next().getExperience() > 0, "orb should carry the dropped experience");
+    }
+
+    @Test
+    void percentageModeDropSpawnsOrbAndLowersLevel() {
+        player.setLevel(30);
+        // PERCENTAGE 50% of 30 = 15 levels lost; 30 > 15 -> partial DROP branch, setLevel(15).
+        effect("PERCENTAGE", "DROP", 50, 50).onDeath(player, null, new NoopLogger());
+
+        assertEquals(15, player.getLevel());
+        Collection<ExperienceOrb> orbs = orbsInWorld();
+        assertEquals(1, orbs.size(), "DROP should spawn exactly one ExperienceOrb");
+        assertTrue(orbs.iterator().next().getExperience() > 0, "orb should carry the dropped experience");
+    }
+
+    @Test
+    void simpleModeDropSpawnsOrbAndLowersLevel() {
+        player.setLevel(10);
+        // SIMPLE min==max -> lose exactly 5 levels; 10 > 5 -> partial DROP branch, setLevel(5).
+        effect("SIMPLE", "DROP", 5, 5).onDeath(player, null, new NoopLogger());
+
+        assertEquals(5, player.getLevel());
+        Collection<ExperienceOrb> orbs = orbsInWorld();
+        assertEquals(1, orbs.size(), "DROP should spawn exactly one ExperienceOrb");
+        assertTrue(orbs.iterator().next().getExperience() > 0, "orb should carry the dropped experience");
+    }
+
+    @Test
+    void dropWithNoLevelsSpawnsNoOrb() {
+        player.setLevel(0);
+        // 0 levels -> levelsToLose < 1 -> early return, no orb spawned.
+        effect("ALL", "DROP", 0, 0).onDeath(player, null, new NoopLogger());
+
+        assertEquals(0, player.getLevel());
+        assertFalse(orbsInWorld().iterator().hasNext(), "no orb should be spawned when there is nothing to drop");
     }
 }
