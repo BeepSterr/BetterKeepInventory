@@ -1,0 +1,56 @@
+name: Tests
+
+# Runs the unit test suite (JUnit 5 + MockBukkit) on every push and PR.
+# Fast feedback so the effect/condition matrix doesn't have to be re-verified by hand.
+# Surefire JUnit XML is published back to the PR as a check + comment.
+# .github/workflows/test.yml
+on:
+  push:
+    branches: [master]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  checks: write        # create the "Test Results" check run
+  pull-requests: write # post/update the results comment on the PR
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+
+      - name: Run tests
+        # Full reactor so both the api and plugin module suites run.
+        # -fae (fail at end) keeps going after a failing module so the report is complete.
+        run: mvn -B --no-transfer-progress -fae test
+
+      - name: Publish test results
+        # Parses Surefire's JUnit XML into a PR check + comment. Runs even when tests
+        # failed (that's exactly when the report matters); the job still fails overall
+        # because the "Run tests" step returned non-zero.
+        uses: EnricoMi/publish-unit-test-result-action@d0a4676d0e0b938bc201470d88276b7c74c712b3 # v2.24.0
+        if: always()
+        with:
+          files: "**/target/surefire-reports/*.xml"
+          check_name: Test Results
+
+      - name: Publish coverage
+        # Posts a JaCoCo coverage summary (overall + changed files) as a PR comment.
+        # Only on PRs (needs a PR to comment on); min-coverage 0 = report only, no gate.
+        uses: madrapps/jacoco-report@e51ce1f46f7f8b5331593f935e59cbaf44b84920 # v1.8.0
+        if: ${{ github.event_name == 'pull_request' }}
+        with:
+          paths: ${{ github.workspace }}/api/target/site/jacoco/jacoco.xml, ${{ github.workspace }}/plugin/target/site/jacoco/jacoco.xml
+          token: ${{ secrets.GITHUB_TOKEN }}
+          title: Coverage
+          min-coverage-overall: 0
+          min-coverage-changed-files: 0

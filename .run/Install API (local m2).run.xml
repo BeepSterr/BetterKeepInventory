@@ -1,0 +1,40 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Install API (local m2)" type="MavenRunConfiguration" factoryName="Maven">
+    <MavenSettings>
+      <option name="myGeneralSettings" />
+      <option name="myRunnerSettings" />
+      <option name="myRunnerParameters">
+        <MavenRunnerParameters>
+          <!-- Installs the api module (and parent pom) into the local .m2 so that
+               building the plugin module in ISOLATION (e.g. IntelliJ's per-test
+               gutter runs) can resolve com.github.beepsterr:betterkeepinventory-api
+               locally instead of trying jitpack, where the unreleased version 404s.
+               Re-run this whenever the api module changes. The 'Tests' config does
+               not need it — a full reactor build resolves api on its own. -->
+          <option name="cmdOptions" value="-am -DskipTests" />
+          <option name="profiles">
+            <set />
+          </option>
+          <option name="goals">
+            <list>
+              <option value="install" />
+            </list>
+          </option>
+          <option name="multimoduleDir" />
+          <option name="pomFileName" value="pom.xml" />
+          <option name="profilesMap">
+            <map />
+          </option>
+          <option name="projectsCmdOptionValues">
+            <list>
+              <option value="api" />
+            </list>
+          </option>
+          <option name="resolveToWorkspace" value="false" />
+          <option name="workingDirPath" value="$PROJECT_DIR$" />
+        </MavenRunnerParameters>
+      </option>
+    </MavenSettings>
+    <method v="2" />
+  </configuration>
+</component>
