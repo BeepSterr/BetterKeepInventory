@@ -15,6 +15,10 @@ folia-supported: true
 # AutoPlug
 spigot-id: 93081
 
+# PluginUpdater
+modrinth-project-id: "j0QDn41h"
+github-repo: "Beeps-Workshop/BetterKeepInventory"
+
 permissions:
 
   betterkeepinventory.player:
