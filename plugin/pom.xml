@@ -95,6 +95,14 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
+            <!-- @NotNull used by the PlaceholderAPI expansion; previously pulled in transitively
+                 by placeholderapi, but 2.12.3 no longer provides it, so declare it explicitly. -->
+            <groupId>org.jetbrains</groupId>
+            <artifactId>annotations</artifactId>
+            <version>26.0.2</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
             <groupId>com.github.beepsterr</groupId>
             <artifactId>betterkeepinventory-api</artifactId>
             <version>2.3.0</version>
