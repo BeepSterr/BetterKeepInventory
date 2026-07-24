@@ -150,7 +150,7 @@ public class Debugger {
     public String upload(){
         String log = getContent();
         try {
-            java.net.URL url = new java.net.URL("https://bin.lunega.dev/post");
+            java.net.URL url = new java.net.URL("https://bin.workshop.beepsterr.com/post");
             java.net.HttpURLConnection conn = (java.net.HttpURLConnection) url.openConnection();
             conn.setRequestMethod("POST");
             conn.setRequestProperty("Content-Type", "text/plain; charset=UTF-8");
